@@ -27,7 +27,7 @@ void loop() {
   duration = pulseIn(echoPin, HIGH);
  
   // Convert the time into a distance
-  cm = (duration/2) * 0.0343;
+  cm = (duration/2) * 0.0343; // sound travels at 0.0343 cm/us
   // inches = (duration/2) * 0.0135;
   
 //  Serial.print(inches);
