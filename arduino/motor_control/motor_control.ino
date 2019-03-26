@@ -39,18 +39,14 @@ void loop()
 {
   if (Serial.available() > 0) {
     char input = Serial.read();
-    if (input == 'R') {
+    if (input == 'M') {
       int m1speed = intParse();
       Serial.print("Set M1 speed to: ");
       Serial.println(m1speed);
-      md.setM1Speed(m1speed);
-      stopIfFault();
-    }
-    else if (input == 'L') {
       int m2speed = intParse();
       Serial.print("Set M2 speed to: ");
       Serial.println(m2speed);
-      md.setM2Speed(m2speed);
+      md.setSpeeds(m1speed, m2speed);
       stopIfFault();
     }
   }
