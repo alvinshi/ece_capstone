@@ -1,8 +1,14 @@
 #include "DualVNH5019MotorShield.h"
+#include <Stepper.h>
 
 DualVNH5019MotorShield md;
 char input;
 char BUFFER[5];
+
+const int stepsPerRevolution = 2048;  // change this to fit the number of steps per revolution
+const int rolePerMinute = 15;         // Adjustable range of 28BYJ-48 stepper is 0~17 rpm
+
+Stepper myStepper(stepsPerRevolution, 8, 10, 9, 11);
 
 void stopIfFault()
 {
@@ -31,8 +37,10 @@ int intParse()
 void setup() 
 {
   Serial.begin(9600);
-  Serial.println("Dual VNH5019 Motor Shield Started");
   md.init(); // Initialize motor driver connection
+  Serial.println("Dual VNH5019 Motor Shield Started");
+  myStepper.setSpeed(rolePerMinute);
+  Serial.println("Step Motor Started");
 }
 
 void loop() 
@@ -48,6 +56,20 @@ void loop()
       Serial.println(m2speed);
       md.setSpeeds(m1speed, m2speed);
       stopIfFault();
+    }
+    else if (input == 'D') {
+      int command = intParse();
+      Serial.print("Set step motor steps to: ");
+      Serial.println(command);
+      myStepper.step(stepsPerRevolution);
+      delay(command);
+    }
+    else if (input == 'U') {
+      int command = intParse();
+      Serial.print("Set step motor steps to: ");
+      Serial.println(command);
+      myStepper.step(-stepsPerRevolution);
+      delay(command);
     }
   }
 }
