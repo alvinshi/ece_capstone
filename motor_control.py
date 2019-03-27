@@ -4,6 +4,7 @@ import time
 class Motor:
     MAXIMUM_SPEED = 400
     MINIMUM_SPEED = 0
+    GATE_MOTOR_DELAY = 10
 
     def __init__(self):
         self.ser = serial.Serial("/dev/tty.usbmodem14101", 9600)
@@ -11,6 +12,8 @@ class Motor:
         self.left_speed = 0
         self.right_speed = 0
         self.stop()
+        self.gate_open = False
+        self.step_motor_up() # Wind the gate motor up
 
     @staticmethod
     def __format_serial_speed_input(speed):
@@ -72,3 +75,20 @@ class Motor:
         self.right_turn(0, 50) # arbitrary number
         time.sleep(seconds)
         self.stop()
+
+    def step_motor_up(self):
+        if self.gate_open:
+            return
+        else:
+            serial_command = "U{}".format(Motor.__format_serial_speed_input(Motor.GATE_MOTOR_DELAY))
+            self.ser.write(bytes(serial_command, 'utf-8'))
+            self.gate_open = True
+
+    def step_motor_down(self):
+        if self.gate_open:
+            serial_command = "D{}".format(Motor.__format_serial_speed_input(Motor.GATE_MOTOR_DELAY))
+            self.ser.write(bytes(serial_command, 'utf-8'))
+            self.gate_open = False
+        else:
+            return
+
