@@ -2,7 +2,7 @@ from enum import Enum
 from motor_control import Motor
 import time
 import sys
-sys.path.insert(0,'../SDK/build')
+sys.path.insert(0,'./SDK/build')
 import cam_run
 from darknet import Darknet
 from util import *
@@ -42,14 +42,14 @@ class Core:
 
     def search(self):
         print('searching')
-        self.motor.forward_gear()
+        #self.motor.forward_gear()
         self.img=self.cam.grab_img()
         self.ball_center=self.cam.detect_ball(self.img[0])
         while  self.ball_center==0: #true or false
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
             self.cam.display_img(self.ball_center,0,self.img[0])
-            self.motor.rotate_clockwise()
+            #self.motor.rotate_clockwise()
         if 0:
             return RetrieverState.WAIT
         else:
@@ -99,9 +99,9 @@ class Core:
                 right_speed=left_speed
             else:
                 (left_speed,right_speed,error,pre_error)=self.PID_speed(self.ball_center,error,pre_error)
-            self.motor.set_speed(left_motor_speed, right_motor_speed)
-            if left_speed == 0 and right_speed == 0:
-                return RetrieverState.CAPTURE
+            #self.motor.set_speed(left_motor_speed, right_motor_speed)
+            #if left_speed == 0 and right_speed == 0:
+                #return RetrieverState.CAPTURE
 
     def capture(self):
         # TODO

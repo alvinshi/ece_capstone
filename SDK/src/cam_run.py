@@ -31,10 +31,10 @@ class Camera:
         self.nms_thesh=0.4
         self.CUDA=torch.cuda.is_available()
         self.num_classes=1
-        self.classes=load_classes("/home/wayne/Capstone/BBall_Retriever/ece_capstone/SDK/data/obj.names")
+        self.classes=load_classes("/home/wayne/Capstone/ece_capstone/SDK/data/obj.names")
         print("Loading network.....")
-        self.model = Darknet("/home/wayne/Capstone/BBall_Retriever/ece_capstone/SDK/cfg/yolo-obj.cfg")
-        self.model.load_weights("/home/wayne/Capstone/BBall_Retriever/ece_capstone/SDK/yolo-obj_6000.weights")
+        self.model = Darknet("/home/wayne/Capstone/ece_capstone/SDK/cfg/yolo-obj.cfg")
+        self.model.load_weights("/home/wayne/Capstone/ece_capstone/SDK/yolo-obj_6000.weights")
         print("Network successfully loaded")
         self.model.net_info["height"] = 416
         self.inp_dim = int(self.model.net_info["height"])
@@ -147,8 +147,8 @@ class Camera:
     
     def grab_img(self):
         cam.grab_img()
-        r_img=cv2.imread('/home/wayne/Capstone/BBall_Retriever/ece_capstone/SDK/build/right.jpg')
-        l_img=cv2.imread('/home/wayne/Capstone/BBall_Retriever/ece_capstone/SDK/build/left.jpg')
+        r_img=cv2.imread('/home/wayne/Capstone/ece_capstone/SDK/build/right.jpg')
+        l_img=cv2.imread('/home/wayne/Capstone/ece_capstone/SDK/build/left.jpg')
         return (l_img,r_img)
     
     def yolo_draw_img(self,x, results):

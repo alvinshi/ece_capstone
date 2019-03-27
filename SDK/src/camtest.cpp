@@ -36,14 +36,14 @@ int grab_img()
             visensor_get_left_latest_img(img_left.data,&left_timestamp,&img_imudata);
             //printf("L-Time: %8.6f, IMUTime: %8.6f\n",left_timestamp,img_imudata.timestamp);
             //imshow("left",img_left);
-            imwrite("/home/wayne/Capstone/BBall_Retriever/ece_capstone/SDK/build/left.jpg",img_left);
+            imwrite("/home/wayne/Capstone/ece_capstone/SDK/build/left.jpg",img_left);
         }
         if(visensor_is_right_img_new())
         {
             visensor_get_right_latest_img(img_right.data,&right_timestamp);
             //printf("R-Time: %8.6f\n",right_timestamp);
             //imshow("right",img_right);
-            imwrite("/home/wayne/Capstone/BBall_Retriever/ece_capstone/SDK/build/right.jpg",img_right);
+            imwrite("/home/wayne/Capstone/ece_capstone/SDK/build/right.jpg",img_right);
         }
     }
     return 0;
@@ -84,7 +84,7 @@ void* show_imuData(void *)
 
 int cam_run()
 {
-    visensor_load_settings("/home/wayne/Capstone/BBall_Retriever/ece_capstone/SDK/optor_VISensor_Setups.txt");
+    visensor_load_settings("/home/wayne/Capstone/ece_capstone/SDK/optor_VISensor_Setups.txt");
     
     int r = visensor_Start_Cameras();
     if(r<0)
