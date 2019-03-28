@@ -11,7 +11,7 @@ class Motor:
         self.gear = 1
         self.left_speed = 0
         self.right_speed = 0
-        self.turn_speed=turn_speed
+        self.turn_speed=100
         self.stop()
         self.gate_open = False
         self.step_motor_up() # Wind the gate motor up
