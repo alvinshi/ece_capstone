@@ -4,14 +4,14 @@ import time
 class Motor:
     MAXIMUM_SPEED = 400
     MINIMUM_SPEED = 0
-    GATE_MOTOR_DELAY = 10
+    GATE_MOTOR_DELAY = 1000
 
-    def __init__(self):
+    def __init__(self,turn_speed):
         self.ser = serial.Serial("/dev/ttyACM0", 9600)
         self.gear = 1
         self.left_speed = 0
         self.right_speed = 0
-        self.turn_speed=100
+        self.turn_speed=turn_speed
         self.stop()
         self.gate_open = False
         self.step_motor_up() # Wind the gate motor up
