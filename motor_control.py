@@ -14,6 +14,7 @@ class Motor:
         self.turn_speed=turn_speed
         self.stop()
         self.gate_open = False
+        time.sleep(5)
         self.step_motor_up() # Wind the gate motor up
 
     @staticmethod
@@ -32,9 +33,7 @@ class Motor:
         left = left * self.gear
         right = right * self.gear
         serial_command = "M{}{}".format(Motor.__format_serial_speed_input(left), Motor.__format_serial_speed_input(right))
-        print('motor sending')
         self.ser.write(bytes(serial_command, 'utf-8'))
-        print('motor send done')
 
     def accelerate(self, boost):
         maximum_boost = min(Motor.MAXIMUM_SPEED - self.left_speed, Motor.MAXIMUM_SPEED - self.right_speed)
@@ -76,25 +75,26 @@ class Motor:
             faster_motor_speed = max(self.left_speed, self.right_speed)
         '''
         slower_motor_speed = int(faster_motor_speed * ratio)
-        print('right turn: '+str(faster_motor_speed))
         self.set_speed(faster_motor_speed, slower_motor_speed)
 
     def rotate_clockwise(self):
         self.right_turn(0, self.turn_speed) # arbitrary number
 
     def step_motor_up(self):
-        if self.gate_open:
+        self.ser.write(bytes("U1000", "utf-8"))
+        '''if self.gate_open:
             return
         else:
             serial_command = "U{}".format(Motor.__format_serial_speed_input(Motor.GATE_MOTOR_DELAY))
             self.ser.write(bytes(serial_command, 'utf-8'))
             self.gate_open = True
-
+'''
     def step_motor_down(self):
-        if self.gate_open:
+        self.ser.write(bytes("D1000", "utf-8"))
+'''        if self.gate_open:
             serial_command = "D{}".format(Motor.__format_serial_speed_input(Motor.GATE_MOTOR_DELAY))
             self.ser.write(bytes(serial_command, 'utf-8'))
             self.gate_open = False
         else:
             return
-
+'''

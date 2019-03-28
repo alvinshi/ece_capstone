@@ -45,11 +45,11 @@ class Core:
             print(self.state)
 
     def search(self):
-        print('searching')
         self.motor.forward_gear()
         self.img=self.cam.grab_img()
         self.ball_center=self.cam.detect_ball(self.img[0])
         self.motor.rotate_clockwise()
+        print('searching')
         while  self.ball_center==0: #no ball detected
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
