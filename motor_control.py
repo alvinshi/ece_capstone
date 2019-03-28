@@ -71,10 +71,8 @@ class Motor:
         slower_motor_speed = int(faster_motor_speed * ratio)
         self.set_speed(faster_motor_speed, slower_motor_speed)
 
-    def rotate_clockwise(self, seconds = 1):
+    def rotate_clockwise(self):
         self.right_turn(0, 50) # arbitrary number
-        time.sleep(seconds)
-        self.stop()
 
     def step_motor_up(self):
         if self.gate_open:

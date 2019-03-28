@@ -18,7 +18,7 @@ class RetrieverState(Enum):
     
 class Core:
     def __init__(self):
-        #self.motor = Motor()
+        self.motor = Motor()
         self.state = RetrieverState.SEARCH
         self.cam=cam_run.Camera()
         self.img=0
@@ -42,14 +42,15 @@ class Core:
 
     def search(self):
         print('searching')
-        #self.motor.forward_gear()
+        self.motor.forward_gear()
         self.img=self.cam.grab_img()
         self.ball_center=self.cam.detect_ball(self.img[0])
+        self.motor.rotate_clockwise()
         while  self.ball_center==0: #true or false
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
             self.cam.display_img(self.ball_center,0,self.img[0])
-            #self.motor.rotate_clockwise()
+        self.motor.stop()
         if 0:
             return RetrieverState.WAIT
         else:
@@ -57,16 +58,14 @@ class Core:
 
     @staticmethod
     def wait():
-        while is_with_ballhandler(): #true or false
+        #while is_with_ballhandler(): #true or false
+        while False:
             time.sleep(1)
         return RetrieverState.TRACK
 
-    def PID_speed(self,ball_center,error,pre_error):
-        d_speed=0
-        left_speed=0
-        right_speed=0
+    def PID_speed(self, ball_center, error):
         (ball_x,ball_y)=ball_center
-        if(abs(error)<=50):
+        if abs(error)<=50:
             error=error*0.5
         pre_error=error
         error=ball_x-self.CENTER_X
@@ -74,15 +73,15 @@ class Core:
         d_speed=self.KP*error+self.KD*(error-pre_error)
         right_speed=self.BASE_SPEED-d_speed
         left_speed=self.BASE_SPEED+d_speed
-        if(right_speed>self.MAX_SPEED):
+        if right_speed > self.MAX_SPEED:
             right_speed=self.MAX_SPEED
-        elif(right_speed<self.MIN_SPEED):
+        elif right_speed<self.MIN_SPEED:
             right_speed=self.MIN_SPEED
-        if(left_speed>self.MAX_SPEED):
+        if left_speed>self.MAX_SPEED:
             left_speed=self.MAX_SPEED
-        elif(left_speed<self.MIN_SPEED):
+        elif left_speed<self.MIN_SPEED:
             left_speed=self.MIN_SPEED
-        return (left_speed,right_speed,error,pre_error)
+        return left_speed,right_speed,error,pre_error
         
     def track(self):
         print('tracking')
@@ -94,12 +93,16 @@ class Core:
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
             self.cam.display_img(self.ball_center,0,self.img[0])
-            if(self.ball_center==0):
+            if self.ball_center == 0:
                 left_speed=min(left_speed,right_speed)
                 right_speed=left_speed
             else:
                 (left_speed,right_speed,error,pre_error)=self.PID_speed(self.ball_center,error,pre_error)
-            #self.motor.set_speed(left_motor_speed, right_motor_speed)
+
+            if left_speed == 0 and right_speed == 0:
+                self.motor.set_speed(30, 30)
+            else:
+                self.motor.set_speed(left_speed, right_speed)
             #if left_speed == 0 and right_speed == 0:
                 #return RetrieverState.CAPTURE
 
