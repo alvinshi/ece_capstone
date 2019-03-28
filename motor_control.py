@@ -6,7 +6,7 @@ class Motor:
     MINIMUM_SPEED = 0
     GATE_MOTOR_DELAY = 10
 
-    def __init__(self,turn_speed):
+    def __init__(self):
         self.ser = serial.Serial("/dev/ttyACM0", 9600)
         self.gear = 1
         self.left_speed = 0

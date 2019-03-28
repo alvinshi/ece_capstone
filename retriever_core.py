@@ -18,7 +18,7 @@ class RetrieverState(Enum):
     
 class Core:
     def __init__(self):
-        
+        self.motor = Motor()
         self.state = RetrieverState.SEARCH
         self.cam=cam_run.Camera()
         self.img=0
@@ -36,7 +36,7 @@ class Core:
         self.MIN_SPEED=100 #-400
         self.BASE_SPEED=150
         self.CENTER_X=420#375 #center of image
-        self.motor = Motor(self.MIN_SPEED)
+        
 
     def run(self):
         while True:
