@@ -27,7 +27,7 @@ class Camera:
     def __init__(self):
         cam.cam_run()
         self.batch_size=1
-        self.confidence=0.8
+        self.confidence=0.9
         self.nms_thesh=0.4
         self.CUDA=torch.cuda.is_available()
         self.num_classes=1
@@ -122,6 +122,7 @@ class Camera:
             draw = time.time()
       
             center=self.yolo_draw_img(output[0],loaded_ims)
+            assert len(center)==2
             return center #X,Y
     
     def detect_player(self,img):
