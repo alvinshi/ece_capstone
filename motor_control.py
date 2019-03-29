@@ -4,17 +4,15 @@ import time
 class Motor:
     MAXIMUM_SPEED = 400
     MINIMUM_SPEED = 0
-    GATE_MOTOR_DELAY = 1000
 
-    def __init__(self,turn_speed):
+    def __init__(self):
         self.ser = serial.Serial("/dev/ttyACM0", 9600)
         self.gear = 1
         self.left_speed = 0
         self.right_speed = 0
-        self.turn_speed=turn_speed
         self.stop()
         self.gate_open = False
-        time.sleep(5)
+        time.sleep(2) # sleep is required to for the motor to have enough set up time, reason unclear
         self.step_motor_up() # Wind the gate motor up
 
     @staticmethod
@@ -22,12 +20,10 @@ class Motor:
         return "{:04d}".format(speed)
 
     def set_speed(self, left, right):
-        '''
         if left < Motor.MINIMUM_SPEED or left > Motor.MAXIMUM_SPEED:
             raise ValueError("illegal left motor speed set at {}".format(left))
         if right < Motor.MINIMUM_SPEED or right > Motor.MAXIMUM_SPEED:
             raise ValueError("illegal right motor speed set at {}".format(right))
-        '''
         self.left_speed = left
         self.right_speed = right
         left = left * self.gear
@@ -68,33 +64,26 @@ class Motor:
         self.set_speed(slower_motor_speed, faster_motor_speed)
 
     def right_turn(self, ratio, faster_motor_speed=-1):
-        '''
         if ratio < 0 or ratio > 1:
             raise ValueError("illegal turning ratio of {}".format(ratio))
         if faster_motor_speed < 0:
             faster_motor_speed = max(self.left_speed, self.right_speed)
-        '''
         slower_motor_speed = int(faster_motor_speed * ratio)
         self.set_speed(faster_motor_speed, slower_motor_speed)
 
-    def rotate_clockwise(self):
-        self.right_turn(0, self.turn_speed) # arbitrary number
+    def rotate_clockwise(self, turn_speed=100):
+        self.right_turn(0, turn_speed) # arbitrary number
 
     def step_motor_up(self):
-        self.ser.write(bytes("U1000", "utf-8"))
-        '''if self.gate_open:
+        if self.gate_open:
             return
         else:
-            serial_command = "U{}".format(Motor.__format_serial_speed_input(Motor.GATE_MOTOR_DELAY))
-            self.ser.write(bytes(serial_command, 'utf-8'))
+            self.ser.write(bytes("U", 'utf-8'))
             self.gate_open = True
-'''
+
     def step_motor_down(self):
-        self.ser.write(bytes("D1000", "utf-8"))
-'''        if self.gate_open:
-            serial_command = "D{}".format(Motor.__format_serial_speed_input(Motor.GATE_MOTOR_DELAY))
-            self.ser.write(bytes(serial_command, 'utf-8'))
+        if self.gate_open:
+            self.ser.write(bytes("D", 'utf-8'))
             self.gate_open = False
         else:
             return
-'''

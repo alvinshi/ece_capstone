@@ -6,7 +6,7 @@ char input;
 char BUFFER[5];
 
 const int stepsPerRevolution = 2048;  // change this to fit the number of steps per revolution
-const int rolePerMinute = 15;         // Adjustable range of 28BYJ-48 stepper is 0~17 rpm
+const int rolePerMinute = 17;         // Adjustable range of 28BYJ-48 stepper is 0~17 rpm
 
 Stepper myStepper(stepsPerRevolution, 8, 10, 9, 11);
 
@@ -58,18 +58,14 @@ void loop()
       stopIfFault();
     }
     else if (input == 'D') {
-      int command = intParse();
-      Serial.print("Set step motor steps to: ");
-      Serial.println(command);
       myStepper.step(stepsPerRevolution);
-      delay(command);
+      delay(200);
+      myStepper.step(stepsPerRevolution);
     }
     else if (input == 'U') {
-      int command = intParse();
-      Serial.print("Set step motor steps to: ");
-      Serial.println(command);
       myStepper.step(-stepsPerRevolution);
-      delay(command);
+      delay(200);
+      myStepper.step(-stepsPerRevolution);
     }
   }
 }
