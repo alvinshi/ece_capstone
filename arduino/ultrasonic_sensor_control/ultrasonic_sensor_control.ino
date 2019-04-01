@@ -10,6 +10,7 @@ int sample_size=10; //set avg sampling size
 long sum1,sum2;
 int max1,max2,min1,min2;
 bool detected=false;
+
 void setup() {
   //Serial Port begin
   Serial.begin (9600);

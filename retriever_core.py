@@ -24,17 +24,17 @@ class Core:
         self.img=0
         self.ball_center=0
         self.player_center=0
-        self.max_unfound=10
+        self.max_unfound=30
         self.num_unfound=0
         #################
         #PID SETUP
         #################
         self.KP=2
-        self.KD=0.7
+        self.KD=1.5
         self.BASE_SPEED=0
-        self.MAX_SPEED=200 #400
-        self.MIN_SPEED=100 #-400
-        self.BASE_SPEED=150
+        self.MAX_SPEED=150 #400
+        self.MIN_SPEED=70 #-400
+        self.BASE_SPEED=100
         self.CENTER_X=420#375 #center of image
         
 

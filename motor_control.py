@@ -13,17 +13,21 @@ class Motor:
         self.stop()
         self.gate_open = False
         time.sleep(2) # sleep is required to for the motor to have enough set up time, reason unclear
-        self.step_motor_up() # Wind the gate motor up
+        
+        self.turn_speed=70
+        #self.step_motor_up() # Wind the gate motor up
 
     @staticmethod
     def __format_serial_speed_input(speed):
         return "{:04d}".format(speed)
 
     def set_speed(self, left, right):
+        '''
         if left < Motor.MINIMUM_SPEED or left > Motor.MAXIMUM_SPEED:
             raise ValueError("illegal left motor speed set at {}".format(left))
         if right < Motor.MINIMUM_SPEED or right > Motor.MAXIMUM_SPEED:
             raise ValueError("illegal right motor speed set at {}".format(right))
+        '''
         self.left_speed = left
         self.right_speed = right
         left = left * self.gear
@@ -56,23 +60,27 @@ class Motor:
         time.sleep(1) # Protect DC motor
 
     def left_turn(self, ratio, faster_motor_speed=-1):
+        '''
         if ratio < 0 or ratio > 1:
             raise ValueError("illegal turning ratio of {}".format(ratio))
+            '''
         if faster_motor_speed < 0:
             faster_motor_speed = max(self.left_speed, self.right_speed)
         slower_motor_speed = int(faster_motor_speed * ratio)
         self.set_speed(slower_motor_speed, faster_motor_speed)
 
     def right_turn(self, ratio, faster_motor_speed=-1):
+        '''
         if ratio < 0 or ratio > 1:
             raise ValueError("illegal turning ratio of {}".format(ratio))
+            '''
         if faster_motor_speed < 0:
             faster_motor_speed = max(self.left_speed, self.right_speed)
         slower_motor_speed = int(faster_motor_speed * ratio)
         self.set_speed(faster_motor_speed, slower_motor_speed)
 
-    def rotate_clockwise(self, turn_speed=100):
-        self.right_turn(0, turn_speed) # arbitrary number
+    def rotate_clockwise(self):
+        self.right_turn(0, self.turn_speed) # arbitrary number
 
     def step_motor_up(self):
         if self.gate_open:
