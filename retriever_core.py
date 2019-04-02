@@ -29,13 +29,13 @@ class Core:
         #################
         #PID SETUP
         #################
-        self.KP=2
-        self.KD=1.5
+        self.KP=3
+        self.KD=1.7
         self.BASE_SPEED=0
         self.MAX_SPEED=150 #400
         self.MIN_SPEED=70 #-400
         self.BASE_SPEED=100
-        self.CENTER_X=420#375 #center of image
+        self.CENTER_X=350 #center of image
         
 
     def run(self):

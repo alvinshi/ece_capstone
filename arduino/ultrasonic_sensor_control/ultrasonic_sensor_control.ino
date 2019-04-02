@@ -38,15 +38,20 @@ void loop() {
   }
   cm1 = (sum1-max1-min1)/(sample_size-2); 
   cm2 = (sum2-max2-min2)/(sample_size-2);
-  
-//  Serial.print(inches);
-//  Serial.print("in, ");
-  Serial.print("Detected ");
+
+  if(cm1<20 || cm2<20){
+    //send detected
+  }
+  else{
+    //send not detected
+  }
+
+  /*Serial.print("Detected ");
   Serial.print(cm1);
   Serial.print("cm   ");
   Serial.print(cm2);
   Serial.print("cm");
   Serial.println();
-  
-  delay(10);
+  */
+  //delay(10);
 }
