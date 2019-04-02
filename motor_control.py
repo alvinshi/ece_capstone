@@ -4,6 +4,7 @@ import time
 class Motor:
     MAXIMUM_SPEED = 400
     MINIMUM_SPEED = 0
+    ROTATE_SPEED = 70
 
     def __init__(self):
         self.ser = serial.Serial("/dev/ttyACM0", 9600)
@@ -14,12 +15,18 @@ class Motor:
         self.gate_open = False
         time.sleep(2) # sleep is required to for the motor to have enough set up time, reason unclear
         
-        self.turn_speed=70
         #self.step_motor_up() # Wind the gate motor up
 
     @staticmethod
     def __format_serial_speed_input(speed):
         return "{:04d}".format(speed)
+
+    # Ignore the internal safety
+    def __force_set_speed(self, left, right):
+        serial_command = "M{}{}".format(Motor.__format_serial_speed_input(left),
+                                        Motor.__format_serial_speed_input(right))
+        self.ser.write(bytes(serial_command, 'utf-8'))
+
 
     def set_speed(self, left, right):
         '''
@@ -80,7 +87,7 @@ class Motor:
         self.set_speed(faster_motor_speed, slower_motor_speed)
 
     def rotate_clockwise(self):
-        self.right_turn(0, self.turn_speed) # arbitrary number
+        self.__force_set_speed(-self.ROTATE_SPEED, self.ROTATE_SPEED)
 
     def step_motor_up(self):
         if self.gate_open:

@@ -48,6 +48,7 @@ class Core:
         self.motor.forward_gear()
         self.img=self.cam.grab_img()
         self.ball_center=self.cam.detect_ball(self.img[0])
+        self.motor.stop()
         self.motor.rotate_clockwise()
         print('searching')
         while  self.ball_center==0: #no ball detected
@@ -55,6 +56,7 @@ class Core:
             self.ball_center=self.cam.detect_ball(self.img[0])
             #self.cam.display_img(self.ball_center,0,self.img[0])
         self.motor.stop()
+        time.sleep(0.5) #Sleep 0.5 second to protect the motor
         if 0:
             return RetrieverState.WAIT
         else:
@@ -101,10 +103,12 @@ class Core:
                 self.num_unfound+=1
                 left_speed=self.MIN_SPEED
                 right_speed=self.MIN_SPEED
+                # Starting triggering the ultrasonic sensor
+                # go to the capture phase if ultrasonic returns positive
             else:
                 self.num_unfound=0
                 (left_speed,right_speed,pre_error)=self.PID_speed(self.ball_center,pre_error)
-            if(self.num_unfound>=self.max_unfound):
+            if self.num_unfound >= self.max_unfound:
                 self.num_unfound=0
                 return RetrieverState.SEARCH
             left_speed=int(left_speed)
