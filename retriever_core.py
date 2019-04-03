@@ -72,7 +72,6 @@ class Core:
 
     def PID_speed(self, ball_center, error):
         (ball_x,ball_y)=ball_center
-
         pre_error=error
         error=ball_x-self.CENTER_X
         
@@ -96,7 +95,6 @@ class Core:
         error=0
         pre_error=0
         while True:
-            #print('num unfound: '+str(self.num_unfound))
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
             #self.cam.display_img(self.ball_center,0,self.img[0])
@@ -115,6 +113,7 @@ class Core:
                 return RetrieverState.SEARCH
             left_speed=int(left_speed)
             right_speed=int(right_speed)
+            print("sending speed to motor")
             self.motor.set_speed(left_speed, right_speed)
             print(left_speed,right_speed)
             #if left_speed == 0 and right_speed == 0:

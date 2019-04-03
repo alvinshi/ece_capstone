@@ -7,13 +7,13 @@ class Motor:
     ROTATE_SPEED = 70
 
     def __init__(self):
-        self.ser = serial.Serial("/dev/ttyACM0", 9600)
+        self.ser = serial.Serial("/dev/ttyACM0", 9600) #try write_timeout=0
         self.gear = 1
         self.left_speed = 0
         self.right_speed = 0
         self.stop()
         self.gate_open = False
-        time.sleep(2) # sleep is required to for the motor to have enough set up time, reason unclear
+        time.sleep(2) # sleep is required for the motor to have enough set up time, reason unclear
         
         #self.step_motor_up() # Wind the gate motor up
 
@@ -26,7 +26,6 @@ class Motor:
         serial_command = "M{}{}".format(Motor.__format_serial_speed_input(left),
                                         Motor.__format_serial_speed_input(right))
         self.ser.write(bytes(serial_command, 'utf-8'))
-
 
     def set_speed(self, left, right):
         self.left_speed = left
@@ -61,20 +60,12 @@ class Motor:
         time.sleep(1) # Protect DC motor
 
     def left_turn(self, ratio, faster_motor_speed=-1):
-        '''
-        if ratio < 0 or ratio > 1:
-            raise ValueError("illegal turning ratio of {}".format(ratio))
-            '''
         if faster_motor_speed < 0:
             faster_motor_speed = max(self.left_speed, self.right_speed)
         slower_motor_speed = int(faster_motor_speed * ratio)
         self.set_speed(slower_motor_speed, faster_motor_speed)
 
     def right_turn(self, ratio, faster_motor_speed=-1):
-        '''
-        if ratio < 0 or ratio > 1:
-            raise ValueError("illegal turning ratio of {}".format(ratio))
-            '''
         if faster_motor_speed < 0:
             faster_motor_speed = max(self.left_speed, self.right_speed)
         slower_motor_speed = int(faster_motor_speed * ratio)

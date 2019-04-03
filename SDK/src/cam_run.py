@@ -34,7 +34,7 @@ class Camera:
         self.classes=load_classes("/home/wayne/Capstone/ece_capstone/SDK/data/obj.names")
         print("Loading network.....")
         self.model = Darknet("/home/wayne/Capstone/ece_capstone/SDK/cfg/yolo-obj.cfg")
-        self.model.load_weights("/home/wayne/Capstone/ece_capstone/SDK/yolo-obj_6900.weights")
+        self.model.load_weights("/home/wayne/Capstone/ece_capstone/SDK/yolo-obj_9300.weights")
         print("Network successfully loaded")
         self.model.net_info["height"] = 416
         self.inp_dim = int(self.model.net_info["height"])
@@ -71,22 +71,16 @@ class Camera:
                     prediction = self.model(Variable(batch), self.CUDA)
 
                 prediction = write_results(prediction, self.confidence, self.num_classes, nms_conf = self.nms_thesh)
-
                 if (type(prediction) == int):
-
                     for im_num, image in enumerate(imlist[i*self.batch_size: min((i +  1)*self.batch_size, len(imlist))]):
-                        im_id = i*self.batch_size + im_num
-                        
+                        im_id = i*self.batch_size + im_num 
                     continue
-
                 prediction[:,0] += i*self.batch_size
-
                 if not write:                      #If we have't initialised output
                     output = prediction  
                     write = 1
                 else:
                     output = torch.cat((output,prediction))
-
                 for im_num, image in enumerate(imlist[i*self.batch_size: min((i +  1)*self.batch_size, len(imlist))]):
                     im_id = i*self.batch_size + im_num
                     objs = [self.classes[int(x[-1])] for x in output if int(x[0]) == im_id]
@@ -95,32 +89,18 @@ class Camera:
             try:
                 output
             except NameError:
-                #cv2.imshow('af',loaded_ims[0])
-                #cv2.waitKey(1)
                 return 0
-
             im_dim_list = torch.index_select(im_dim_list, 0, output[:,0].long())
-
             scaling_factor = torch.min(416/im_dim_list,1)[0].view(-1,1)
-
-
+            
             output[:,[1,3]] -= (self.inp_dim - scaling_factor*im_dim_list[:,0].view(-1,1))/2
             output[:,[2,4]] -= (self.inp_dim - scaling_factor*im_dim_list[:,1].view(-1,1))/2
-
-
-
             output[:,1:5] /= scaling_factor
 
             for i in range(output.shape[0]):
                 output[i, [1,3]] = torch.clamp(output[i, [1,3]], 0.0, im_dim_list[i,0])
                 output[i, [2,4]] = torch.clamp(output[i, [2,4]], 0.0, im_dim_list[i,1])
-        
-        
-            output_recast = time.time()
-            class_load = time.time()
-            
-            draw = time.time()
-      
+
             center=self.yolo_draw_img(output[0],loaded_ims)
             assert len(center)==2
             return center #X,Y
@@ -135,7 +115,6 @@ class Camera:
         else:
             center=result[0].center
             center=(int(center[0]),int(center[1]))
-            
         return center
     
     def display_img(self,ball_center,player_center,img):
@@ -167,7 +146,6 @@ class Camera:
     
     def close_cam(self):
         cam.close_cam()
-
 
 '''
 camera=Camera()
