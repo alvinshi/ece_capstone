@@ -29,12 +29,6 @@ class Motor:
 
 
     def set_speed(self, left, right):
-        '''
-        if left < Motor.MINIMUM_SPEED or left > Motor.MAXIMUM_SPEED:
-            raise ValueError("illegal left motor speed set at {}".format(left))
-        if right < Motor.MINIMUM_SPEED or right > Motor.MAXIMUM_SPEED:
-            raise ValueError("illegal right motor speed set at {}".format(right))
-        '''
         self.left_speed = left
         self.right_speed = right
         left = left * self.gear

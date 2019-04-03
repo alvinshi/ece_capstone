@@ -34,7 +34,7 @@ class Camera:
         self.classes=load_classes("/home/wayne/Capstone/ece_capstone/SDK/data/obj.names")
         print("Loading network.....")
         self.model = Darknet("/home/wayne/Capstone/ece_capstone/SDK/cfg/yolo-obj.cfg")
-        self.model.load_weights("/home/wayne/Capstone/ece_capstone/SDK/yolo-obj_6000.weights")
+        self.model.load_weights("/home/wayne/Capstone/ece_capstone/SDK/yolo-obj_6900.weights")
         print("Network successfully loaded")
         self.model.net_info["height"] = 416
         self.inp_dim = int(self.model.net_info["height"])

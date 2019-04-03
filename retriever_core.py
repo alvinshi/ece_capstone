@@ -29,13 +29,14 @@ class Core:
         #################
         #PID SETUP
         #################
-        self.KP=3
-        self.KD=1.7
+        self.KP=1.5
+        self.KD=0
         self.BASE_SPEED=0
         self.MAX_SPEED=150 #400
-        self.MIN_SPEED=70 #-400
+        self.MIN_SPEED=100 #-400
         self.BASE_SPEED=100
-        self.CENTER_X=350 #center of image
+        self.IDLE_SPEED=80
+        self.CENTER_X=380 #center of image
         
 
     def run(self):
@@ -95,14 +96,15 @@ class Core:
         error=0
         pre_error=0
         while True:
-            print('num unfound: '+str(self.num_unfound))
+            #print('num unfound: '+str(self.num_unfound))
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
             #self.cam.display_img(self.ball_center,0,self.img[0])
             if self.ball_center == 0:
                 self.num_unfound+=1
-                left_speed=self.MIN_SPEED
-                right_speed=self.MIN_SPEED
+                left_speed=self.IDLE_SPEED
+                right_speed=self.IDLE_SPEED
+                print('can not see')
                 # Starting triggering the ultrasonic sensor
                 # go to the capture phase if ultrasonic returns positive
             else:
@@ -113,7 +115,6 @@ class Core:
                 return RetrieverState.SEARCH
             left_speed=int(left_speed)
             right_speed=int(right_speed)
-            print('sending')
             self.motor.set_speed(left_speed, right_speed)
             print(left_speed,right_speed)
             #if left_speed == 0 and right_speed == 0:
