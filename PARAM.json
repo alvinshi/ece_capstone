@@ -1,4 +1,7 @@
 {
+    "VISUALIZE":0,
+    "MOVE":0,
+    
     "KP":1.5,
     "KD":0,
     "BASE_SPEED":100,
@@ -7,7 +10,7 @@
     "IDLE_SPEED":80,
     "IMG_CENTER_X":380,
     
-    "DIST_THRESHOLD":2,
+    "DIST_THRESHOLD":1,
     "MAX_UNFOUND":30,
     
     "BATCH_SIZE":1,
@@ -67,5 +70,4 @@
     "preFilterCap":4,
     "speckleWindowSize":150,
     "speckleRange":2
-    
 }
