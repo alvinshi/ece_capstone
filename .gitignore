@@ -1,5 +1,5 @@
 ./SDK/build/
-./optor_calibration/
+optor_calibration/
 *.weights
 *.jpg
 # Byte-compiled / optimized / DLL files
