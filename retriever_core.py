@@ -111,7 +111,7 @@ class Core:
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
             self.player_center=self.cam.detect_player(self.img[0])
-            self.cam.display_img(self.ball_center,self.player_center,self.img[0])
+            #self.cam.display_img(self.ball_center,self.player_center,self.img[0])
             
             if self.ball_center !=0 and self.player_center!=0:
                 self.num_unfound=0

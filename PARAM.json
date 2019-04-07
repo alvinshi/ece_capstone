@@ -58,6 +58,14 @@
          [0, 0, 10.02635407, -0]],
     "IMG_SIZE_X":752,
     "IMG_SIZE_Y":480,
-    "NUM_DISP":80,
-    "BLOCK_SIZE":15
+    
+    "MIN_DISP":8,
+    "NUM_DISP":112,
+    "BLOCK_SIZE":15,
+    "DISP12MaxDiff":10,
+    "uniquenessRatio":1,
+    "preFilterCap":4,
+    "speckleWindowSize":150,
+    "speckleRange":2
+    
 }
