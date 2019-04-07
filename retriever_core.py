@@ -25,15 +25,14 @@ class Core:
         ########
         #SETUP
         ########
-        inputJSON=dir_path
         fp = open(inputJSON)
         projectDict = json.load(fp)
         fp.close()
         
-        self.Stereo=Stereo(inputJSON)
-        self.motor = Motor()
+        self.Stereo=Stereo(projectDict)
+        #self.motor = Motor()
         self.state = RetrieverState.SEARCH
-        self.cam=cam_run.Camera()
+        self.cam=cam_run.Camera(projectDict)
         self.img=0
         self.ball_center=0
         self.player_center=0
@@ -60,17 +59,17 @@ class Core:
             print(self.state)
 
     def search(self):
-        self.motor.forward_gear()
+        #self.motor.forward_gear()
         self.img=self.cam.grab_img()
         self.ball_center=self.cam.detect_ball(self.img[0])
-        self.motor.stop()
-        self.motor.rotate_clockwise()
+        #self.motor.stop()
+        #self.motor.rotate_clockwise()
         print('searching')
         while  self.ball_center==0: #no ball detected
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
             #self.cam.display_img(self.ball_center,0,self.img[0])
-        self.motor.stop()
+        #self.motor.stop()
         time.sleep(0.5) #Sleep 0.5 second to protect the motor
         if 0:
             return RetrieverState.WAIT
@@ -112,13 +111,15 @@ class Core:
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
             self.player_center=self.cam.detect_player(self.img[0])
-            #self.cam.display_img(self.ball_center,0,self.img[0])
+            self.cam.display_img(self.ball_center,self.player_center,self.img[0])
+            
             if self.ball_center !=0 and self.player_center!=0:
+                self.num_unfound=0
                 distance=self.Stereo.measure_dist(self.img,self.ball_center,self.player_center)
-                if distance<self.dist_thresh:
-                    return RetrieverState.WAIT
+                if distance<self.dist_thresh and distance != 0:
+                    afd=1
+                    #return RetrieverState.TRACK
                 else:
-                    self.num_unfound=0
                     (left_speed,right_speed,pre_error)=self.PID_speed(self.ball_center,pre_error)
             else:
                 if self.ball_center == 0:
@@ -131,13 +132,25 @@ class Core:
                 else:
                     self.num_unfound=0
                     (left_speed,right_speed,pre_error)=self.PID_speed(self.ball_center,pre_error)
+            '''
+            if self.ball_center == 0:
+                self.num_unfound+=1
+                left_speed=self.IDLE_SPEED
+                right_speed=self.IDLE_SPEED
+                print('can not see')
+                # Starting triggering the ultrasonic sensor
+                # go to the capture phase if ultrasonic returns positive
+            else:
+                self.num_unfound=0
+                (left_speed,right_speed,pre_error)=self.PID_speed(self.ball_center,pre_error)
+            '''
             if self.num_unfound >= self.max_unfound:
                 self.num_unfound=0
                 return RetrieverState.SEARCH
             left_speed=int(left_speed)
             right_speed=int(right_speed)
             print("sending speed to motor")
-            self.motor.set_speed(left_speed, right_speed)
+            #self.motor.set_speed(left_speed, right_speed)
             print(left_speed,right_speed)
             #if left_speed == 0 and right_speed == 0:
                 #return RetrieverState.CAPTURE

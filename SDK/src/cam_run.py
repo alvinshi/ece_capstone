@@ -24,13 +24,7 @@ class Camera:
     ##############################
     #Yolo PARAMETERS DARKNET SETUP 
     ##############################
-    def __init__(self):
-        inputJSON='../../PARAM.json'
-        inputJSON=dir_path
-        fp = open(inputJSON)
-        projectDict = json.load(fp)
-        fp.close()
-        
+    def __init__(self,projectDict):
         cam.cam_run()
         self.batch_size=projectDict["BATCH_SIZE"]
         self.confidence=projectDict["CONFIDENCE"]
