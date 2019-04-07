@@ -1,6 +1,9 @@
 from enum import Enum
 from motor_control import Motor
+from stereo import Stereo
 import time
+import numpy as np
+import json
 import sys
 sys.path.insert(0,'./SDK/build')
 import cam_run
@@ -18,25 +21,36 @@ class RetrieverState(Enum):
     
 class Core:
     def __init__(self):
+        inputJSON='PARAM.json'
+        ########
+        #SETUP
+        ########
+        inputJSON=dir_path
+        fp = open(inputJSON)
+        projectDict = json.load(fp)
+        fp.close()
+        
+        self.Stereo=Stereo(inputJSON)
         self.motor = Motor()
         self.state = RetrieverState.SEARCH
         self.cam=cam_run.Camera()
         self.img=0
         self.ball_center=0
         self.player_center=0
-        self.max_unfound=30
+        self.max_unfound=projectDict["MAX_UNFOUND"]
         self.num_unfound=0
+        self.dist_thresh=projectDict["DIST_THRESHOLD"] #unit m
         #################
         #PID SETUP
         #################
-        self.KP=1.5
-        self.KD=0
-        self.BASE_SPEED=0
-        self.MAX_SPEED=150 #400
-        self.MIN_SPEED=100 #-400
-        self.BASE_SPEED=100
-        self.IDLE_SPEED=80
-        self.CENTER_X=380 #center of image
+        self.KP=projectDict["KP"]
+        self.KD=projectDict["KD"]
+        self.BASE_SPEED=projectDict["BASE_SPEED"]
+        self.MAX_SPEED=projectDict["MAX_SPEED"] #400
+        self.MIN_SPEED=projectDict["MIN_SPEED"] #-400
+        self.BASE_SPEED=projectDict["BASE_SPEED"]
+        self.IDLE_SPEED=projectDict["IDLE_SPEED"]
+        self.CENTER_X=projectDict["IMG_CENTER_X"] #center of image
         
 
     def run(self):
@@ -97,17 +111,26 @@ class Core:
         while True:
             self.img=self.cam.grab_img()
             self.ball_center=self.cam.detect_ball(self.img[0])
+            self.player_center=self.cam.detect_player(self.img[0])
             #self.cam.display_img(self.ball_center,0,self.img[0])
-            if self.ball_center == 0:
-                self.num_unfound+=1
-                left_speed=self.IDLE_SPEED
-                right_speed=self.IDLE_SPEED
-                print('can not see')
-                # Starting triggering the ultrasonic sensor
-                # go to the capture phase if ultrasonic returns positive
+            if self.ball_center !=0 and self.player_center!=0:
+                distance=self.Stereo.measure_dist(self.img,self.ball_center,self.player_center)
+                if distance<self.dist_thresh:
+                    return RetrieverState.WAIT
+                else:
+                    self.num_unfound=0
+                    (left_speed,right_speed,pre_error)=self.PID_speed(self.ball_center,pre_error)
             else:
-                self.num_unfound=0
-                (left_speed,right_speed,pre_error)=self.PID_speed(self.ball_center,pre_error)
+                if self.ball_center == 0:
+                    self.num_unfound+=1
+                    left_speed=self.IDLE_SPEED
+                    right_speed=self.IDLE_SPEED
+                    print('can not see')
+                    # Starting triggering the ultrasonic sensor
+                    # go to the capture phase if ultrasonic returns positive
+                else:
+                    self.num_unfound=0
+                    (left_speed,right_speed,pre_error)=self.PID_speed(self.ball_center,pre_error)
             if self.num_unfound >= self.max_unfound:
                 self.num_unfound=0
                 return RetrieverState.SEARCH

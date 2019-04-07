@@ -25,16 +25,27 @@ class Camera:
     #Yolo PARAMETERS DARKNET SETUP 
     ##############################
     def __init__(self):
+        inputJSON='../../PARAM.json'
+        inputJSON=dir_path
+        fp = open(inputJSON)
+        projectDict = json.load(fp)
+        fp.close()
+        
         cam.cam_run()
-        self.batch_size=1
-        self.confidence=0.9
-        self.nms_thesh=0.4
+        self.batch_size=projectDict["BATCH_SIZE"]
+        self.confidence=projectDict["CONFIDENCE"]
+        self.nms_thesh=projectDict["NMS_THRESH"]
         self.CUDA=torch.cuda.is_available()
-        self.num_classes=1
-        self.classes=load_classes("/home/wayne/Capstone/ece_capstone/SDK/data/obj.names")
+        self.num_classes=projectDict["NUM_CLASSES"]
+        self.root_path=projectDict["ROOT_PATH"]
+        name_file=projectDict["OBJ_NAME_PATH"]
+        cfg_file=projectDict["CFG_PATH"]
+        weight_file=projectDict["WEIGHTS_PATH"]
+        self.classes=load_classes(name_file)
         print("Loading network.....")
-        self.model = Darknet("/home/wayne/Capstone/ece_capstone/SDK/cfg/yolo-obj.cfg")
-        self.model.load_weights("/home/wayne/Capstone/ece_capstone/SDK/yolo-obj_15000.weights")
+        self.model = Darknet(cfg_file)
+        
+        self.model.load_weights(weight_file)
         print("Network successfully loaded")
         self.model.net_info["height"] = 416
         self.inp_dim = int(self.model.net_info["height"])
@@ -127,8 +138,8 @@ class Camera:
     
     def grab_img(self):
         cam.grab_img()
-        r_img=cv2.imread('/home/wayne/Capstone/ece_capstone/SDK/build/right.jpg')
-        l_img=cv2.imread('/home/wayne/Capstone/ece_capstone/SDK/build/left.jpg')
+        r_img=cv2.imread(self.root_path+'right.jpg')
+        l_img=cv2.imread(self.root_path+'left.jpg')
         return (l_img,r_img)
     
     def yolo_draw_img(self,x, results):
