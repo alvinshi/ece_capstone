@@ -8,7 +8,7 @@ char BUFFER[5];
 const int stepsPerRevolution = 2048;  // change this to fit the number of steps per revolution
 const int rolePerMinute = 17;         // Adjustable range of 28BYJ-48 stepper is 0~17 rpm
 
-Stepper myStepper(stepsPerRevolution, 8, 10, 9, 11);
+Stepper myStepper(stepsPerRevolution, 3, 11, 5, 13);
 
 void stopIfFault()
 {

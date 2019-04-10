@@ -18,7 +18,8 @@ const int stepsPerRevolution = 2048;  // change this to fit the number of steps 
 const int rolePerMinute = 15;         // Adjustable range of 28BYJ-48 stepper is 0~17 rpm
 
 // initialize the stepper library on pins 8 through 11:
-Stepper myStepper(stepsPerRevolution, 8, 10, 9, 11);
+Stepper myStepper(stepsPerRevolution, 3, 11, 5, 13);
+//Stepper myStepper(stepsPerRevolution, 8, 10, 9, 11);
 
 void setup() {
   myStepper.setSpeed(rolePerMinute);
