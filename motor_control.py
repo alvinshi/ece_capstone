@@ -87,3 +87,40 @@ class Motor:
             self.gate_open = False
         else:
             return
+
+class DummyMotor:
+    def __init__(self):
+        return
+
+    def set_speed(self, left, right):
+        return
+
+    def accelerate(self, boost):
+        return
+
+    def decelerate(self, brake):
+        return
+
+    def stop(self):
+        return
+
+    def forward_gear(self):
+        return
+
+    def reverse_gear(self):
+        return
+
+    def left_turn(self, ratio, faster_motor_speed=-1):
+        return
+
+    def right_turn(self, ratio, faster_motor_speed=-1):
+        return
+
+    def rotate_clockwise(self):
+        return
+
+    def step_motor_up(self):
+        return
+
+    def step_motor_down(self):
+        return

@@ -61,8 +61,12 @@ void loop()
       myStepper.step(stepsPerRevolution);
       delay(200);
       myStepper.step(stepsPerRevolution);
+      delay(200);
+      myStepper.step(stepsPerRevolution);
     }
     else if (input == 'U') {
+      myStepper.step(-stepsPerRevolution);
+      delay(200);
       myStepper.step(-stepsPerRevolution);
       delay(200);
       myStepper.step(-stepsPerRevolution);
