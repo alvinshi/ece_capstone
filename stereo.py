@@ -55,6 +55,8 @@ class Stereo:
         
         
     def measure_dist(self, img_pair,ball_center,player_center):
+        if(player_center==0 or ball_center==0): #no need to measure dist
+            return 0
         img_left=img_pair[0]
         img_right=img_pair[1]
         img_left_rect=cv2.remap(img_left, self.Map_Left_1, self.Map_Left_2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
@@ -64,22 +66,20 @@ class Stereo:
 
         disparity = self.stereo.compute(imgl,imgr)
         points=cv2.reprojectImageTo3D(disparity,self.Q,handleMissingValues=True)
-        if ball_center != 0:
-            (b_x,b_y)=ball_center
-            bp=points[b_y][b_x]
-        if player_center !=0 :
-            (p_x,p_y)=player_center
-            pp=points[p_y][p_x]
         
-        
-        if bp[2]>100 or pp[2]>100:
+        (p_x,p_y)=player_center
+        pp=points[p_y][p_x]   
+        (b_x,b_y)=ball_center
+        bp=points[b_y][b_x]
+
+        if bp[2]>100 or pp[2]>100: #out of range
             return 0 
         #units in m
         bp=bp*10
         pp=pp*10
         #too far from ball, move closer
         if bp[2]>1:
-            print("far")
+            print("ball far")
             return 0
         
         a=bp[0]-pp[0]

@@ -85,8 +85,8 @@ class Core:
 
         # Check if the player is around
         player_center = self.cam.detect_player(img[0])
-        #distance = self.Stereo.measure_dist(img, ball_center, player_center)
-        distance =0 
+        distance = self.Stereo.measure_dist(img, ball_center, player_center)
+        
         if player_center != 0 and self.dist_thresh and distance != 0:
             print("Search Phase: Transition to Wait State")
             return RetrieverState.WAIT
@@ -105,7 +105,7 @@ class Core:
             
             if ball_center != 0:
                 if player_center != 0:
-                    distance = 0#self.Stereo.measure_dist(img, ball_center, player_center)
+                    distance = self.Stereo.measure_dist(img, ball_center, player_center)
                     if distance > self.dist_thresh or distance == 0:
                         print("Wait State: Ball is far enough from the player, transition to Wait State")
                         return RetrieverState.TRACK
