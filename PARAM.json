@@ -7,8 +7,8 @@
     "BASE_SPEED":100,
     "MAX_SPEED":150,
     "MIN_SPEED":100,
-    "IDLE_SPEED":80,
-    "IMG_CENTER_X":380,
+    "IDLE_SPEED":70,
+    "IMG_CENTER_X":390,
     
     "DIST_THRESHOLD":1,
     "MAX_UNFOUND":30,

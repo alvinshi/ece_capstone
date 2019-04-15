@@ -15,8 +15,10 @@ class Motor:
         self.gate_open = False
         time.sleep(2) # sleep is required for the motor to have enough set up time, reason unclear
         if lift_gate:
+            print("Motor Init: Step motor up")
             self.step_motor_up()
         if drop_gate:
+            print("Motor Init: Step motor down")
             self.step_motor_down()
 
     @staticmethod
