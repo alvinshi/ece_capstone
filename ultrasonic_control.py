@@ -8,9 +8,7 @@ class Ultrasonic:
 
     def measure(self):
         self.ser.write(bytes("M", 'utf-8'))
-        print("sent")
         result = self.ser.readline()
-        print(result)
         return int(result) == 1
 
     def close(self):

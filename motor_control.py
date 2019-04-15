@@ -6,7 +6,7 @@ class Motor:
     MINIMUM_SPEED = 0
     ROTATE_SPEED = 70
 
-    def __init__(self):
+    def __init__(self, lift_gate=False, drop_gate=False):
         self.ser = serial.Serial("/dev/ttyACM0", 9600) #try write_timeout=0
         self.gear = 1
         self.left_speed = 0
@@ -14,8 +14,10 @@ class Motor:
         self.stop()
         self.gate_open = False
         time.sleep(2) # sleep is required for the motor to have enough set up time, reason unclear
-        
-        #self.step_motor_up() # Wind the gate motor up
+        if lift_gate:
+            self.step_motor_up()
+        if drop_gate:
+            self.step_motor_down()
 
     @staticmethod
     def __format_serial_speed_input(speed):

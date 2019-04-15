@@ -32,7 +32,13 @@ class Core:
         self.vis=projectDict["VISUALIZE"]
         self.move=projectDict["MOVE"]
         if self.move:
-            self.motor = Motor()
+            # Initialize motor and set gate position
+            if len(sys.argv) > 1 and sys.argv[1] == "up":
+                self.motor = Motor(True, False)
+            elif len(sys.argv) > 1 and sys.argv[1] == "down":
+                self.motor = Motor(False, True)
+            else:
+                self.motor = Motor()
         else:
             self.motor = DummyMotor()
         self.Stereo=Stereo(projectDict)
@@ -57,7 +63,6 @@ class Core:
 
         # Ultrasonic
         self.ultrasonic = Ultrasonic()
-        
 
     def run(self):
         while True:
