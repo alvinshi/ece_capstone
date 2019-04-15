@@ -85,7 +85,8 @@ class Core:
 
         # Check if the player is around
         player_center = self.cam.detect_player(img[0])
-        distance = self.Stereo.measure_dist(img, ball_center, player_center)
+        #distance = self.Stereo.measure_dist(img, ball_center, player_center)
+        distance =0 
         if player_center != 0 and self.dist_thresh and distance != 0:
             print("Search Phase: Transition to Wait State")
             return RetrieverState.WAIT
@@ -104,7 +105,7 @@ class Core:
             
             if ball_center != 0:
                 if player_center != 0:
-                    distance = self.Stereo.measure_dist(img, ball_center, player_center)
+                    distance = 0#self.Stereo.measure_dist(img, ball_center, player_center)
                     if distance > self.dist_thresh or distance == 0:
                         print("Wait State: Ball is far enough from the player, transition to Wait State")
                         return RetrieverState.TRACK
@@ -129,13 +130,13 @@ class Core:
             if ball_center != 0:
                 num_not_found = 0
                 if player_center != 0:
-                    distance = self.Stereo.measure_dist(self.img,self.ball_center,self.player_center)
+                    distance = self.Stereo.measure_dist(img, ball_center, player_center)
                     if distance < self.dist_thresh and distance != 0:
                         print("Track State: Ball back in control, transition Wait State")
                         self.motor.stop()
                         return RetrieverState.WAIT
                 else:
-                    (left_speed, right_speed, pre_error) = self.__pid_speed(self.ball_center,pre_error)
+                    (left_speed, right_speed, pre_error) = self.__pid_speed(ball_center, pre_error)
                     self.motor.set_speed(int(left_speed), int(right_speed))
                     print("Track State: Tracking with {} {}".format(left_speed, right_speed))
             else:

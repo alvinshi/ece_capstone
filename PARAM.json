@@ -1,6 +1,6 @@
 {
     "VISUALIZE":0,
-    "MOVE":0,
+    "MOVE":1,
     
     "KP":1.5,
     "KD":0,

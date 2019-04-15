@@ -64,11 +64,14 @@ class Stereo:
 
         disparity = self.stereo.compute(imgl,imgr)
         points=cv2.reprojectImageTo3D(disparity,self.Q,handleMissingValues=True)
+        if ball_center != 0:
+            (b_x,b_y)=ball_center
+            bp=points[b_y][b_x]
+        if player_center !=0 :
+            (p_x,p_y)=player_center
+            pp=points[p_y][p_x]
         
-        (b_x,b_y)=ball_center
-        (p_x,p_y)=player_center
-        bp=points[b_y][b_x]
-        pp=points[p_y][p_x]
+        
         if bp[2]>100 or pp[2]>100:
             return 0 
         #units in m
