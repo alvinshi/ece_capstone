@@ -77,7 +77,6 @@ class Core:
         self.motor.rotate_clockwise()
         img = self.cam.grab_img()
         ball_center = self.cam.detect_ball(img[0])
-
         while ball_center == 0: #no ball detected
             img = self.cam.grab_img()
             ball_center = self.cam.detect_ball(img[0])

@@ -52,8 +52,6 @@ class Stereo:
                                           speckleRange=speckleRange,
                                           )
         
-        
-        
     def measure_dist(self, img_pair,ball_center,player_center):
         if(player_center==0 or ball_center==0): #no need to measure dist
             return 0
