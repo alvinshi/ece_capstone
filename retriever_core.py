@@ -150,7 +150,9 @@ class Core:
                     print("Track State: Permanent loss, transition to Search State")
                     return RetrieverState.SEARCH
 
-                self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
+                if num_not_found == 1: # Only send idle speed command one time
+                    self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
+
                 ball_in = self.ultrasonic.measure()
                 if ball_in:
                     self.motor.stop()

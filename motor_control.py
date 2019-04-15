@@ -7,7 +7,7 @@ class Motor:
     ROTATE_SPEED = 70
 
     def __init__(self, lift_gate=False, drop_gate=False):
-        self.ser = serial.Serial("/dev/ttyACM0", 9600) #try write_timeout=0
+        self.ser = serial.Serial("/dev/ttyACM0", 9600, write_timeout=0) #try write_timeout=0
         self.gear = 1
         self.left_speed = 0
         self.right_speed = 0
