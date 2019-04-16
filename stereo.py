@@ -71,7 +71,7 @@ class Stereo:
         (p_x,p_y)=player_center
         pp=points[p_y][p_x]
 
-        if pp[2]>100: #out of range
+        if pp[2]>1000: #out of range
             print("got invalid player dist")
             return 0 
         #units in m
@@ -99,7 +99,7 @@ class Stereo:
         (b_x,b_y)=ball_center
         bp=points[b_y][b_x]
 
-        if bp[2]>100: #out of range
+        if bp[2]>1000: #out of range
             print("got invalid ball dist")
             return 0 
         #units in m

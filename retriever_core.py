@@ -147,6 +147,10 @@ class Core:
                         print("Track State: Ball back in control, transition Wait State")
                         self.motor.stop()
                         return RetrieverState.WAIT
+                    else:
+                        (left_speed, right_speed, pre_error) = self.__pid_speed(ball_center, pre_error)
+                        self.motor.set_speed(int(left_speed), int(right_speed))
+                        print("Track State: Tracking with {} {}".format(left_speed, right_speed))
                 else:
                     (left_speed, right_speed, pre_error) = self.__pid_speed(ball_center, pre_error)
                     self.motor.set_speed(int(left_speed), int(right_speed))
@@ -182,7 +186,7 @@ class Core:
         print('Player_Search State: Start Searching')
         self.motor.stop()
         self.motor.forward_gear()
-        self.motor.rotate_clockwise()
+        self.motor.set_speed(self.IDLE_SPEED, 0)
         img = self.cam.grab_img()
         player_center = self.cam.detect_player(img[0])
 
