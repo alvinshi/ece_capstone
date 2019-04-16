@@ -138,7 +138,6 @@ class Core:
             player_center = self.cam.detect_player(img[0])
             if self.vis:
                 self.cam.display_img(ball_center,player_center,img[0])
-            
             if ball_center != 0:
                 num_not_found = 0
                 if player_center != 0:
@@ -211,14 +210,14 @@ class Core:
                 num_not_found = 0
 
                 player_distance = self.stereo.measure_player_dist(img, player_center)
-                if player_distance < self.OFFER_THRESHOD:
+          
+                if player_distance < self.OFFER_THRESHOD and player_distance != 0:
                     print("Offer State: Close enough, transition to the player state")
                     return RetrieverState.RELEASE
 
-
                 (left_speed, right_speed, pre_error) = self.__pid_speed(player_center, pre_error)
                 self.motor.set_speed(int(left_speed), int(right_speed))
-                print("Offer State: Approaching with {} {}".format(left_speed, right_speed))
+                print("Offer State: Approaching with {} {} distance: {}".format(left_speed, right_speed,player_distance))
             else:
                 num_not_found += 1
                 self.motor.stop()
