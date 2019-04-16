@@ -2,13 +2,14 @@ from enum import Enum
 from motor_control import Motor, DummyMotor
 from ultrasonic_control import Ultrasonic
 from stereo import Stereo
+
 import time
 import signal
 import numpy as np
 import json
 import sys
 sys.path.insert(0,'./SDK/build')
-import cam_run
+from cam_run import Camera
 from darknet import Darknet
 from util import *
 
@@ -43,15 +44,16 @@ class Core:
                 self.motor = Motor()
         else:
             self.motor = DummyMotor()
-        self.Stereo=Stereo(projectDict)
+        self.stereo=Stereo(projectDict)
         self.state = RetrieverState.SEARCH
-        self.cam=cam_run.Camera(projectDict)
+        self.cam = Camera(projectDict)
         self.img=0
         self.ball_center=0
         self.player_center=0
         self.max_unfound=projectDict["MAX_UNFOUND"]
         self.max_player_unfound = projectDict["MAX_PLAYER_UNFOUND"]
         self.dist_thresh=projectDict["DIST_THRESHOLD"] #unit m
+        self.OFFER_THRESHOD = projectDict["OFFER_THRESHOLD"]
         #################
         #PID SETUP
         #################
@@ -92,7 +94,7 @@ class Core:
 
         # Check if the player is around
         player_center = self.cam.detect_player(img[0])
-        distance = self.Stereo.measure_dist(img, ball_center, player_center)
+        distance = self.stereo.measure_dist(img, ball_center, player_center)
         
         if player_center != 0 and self.dist_thresh and distance != 0:
             print("Search Phase: Transition to Wait State")
@@ -112,7 +114,7 @@ class Core:
             
             if ball_center != 0:
                 if player_center != 0:
-                    distance = self.Stereo.measure_dist(img, ball_center, player_center)
+                    distance = self.stereo.measure_dist(img, ball_center, player_center)
                     if distance > self.dist_thresh or distance == 0:
                         print("Wait State: Ball is far enough from the player, transition to Wait State")
                         return RetrieverState.TRACK
@@ -137,7 +139,7 @@ class Core:
             if ball_center != 0:
                 num_not_found = 0
                 if player_center != 0:
-                    distance = self.Stereo.measure_dist(img, ball_center, player_center)
+                    distance = self.stereo.measure_dist(img, ball_center, player_center)
                     if distance < self.dist_thresh and distance != 0:
                         print("Track State: Ball back in control, transition Wait State")
                         self.motor.stop()
@@ -200,7 +202,13 @@ class Core:
 
             if player_center != 0:
                 num_not_found = 0
-                # TODO: measure distance, go to release state if close enough
+
+                player_distance = self.stereo.measure_player_dist(img, player_center)
+                if player_distance < self.OFFER_THRESHOD:
+                    print("Offer State: Close enough, transition to the player state")
+                    return RetrieverState.RELEASE
+
+
                 (left_speed, right_speed, pre_error) = self.__pid_speed(player_center, pre_error)
                 self.motor.set_speed(int(left_speed), int(right_speed))
                 print("Offer State: Approaching with {} {}".format(left_speed, right_speed))
@@ -255,6 +263,7 @@ def main():
         print('You pressed Ctrl+C!')
         core.motor.stop()
         core.motor.step_motor_down()
+        core.cam.close_cam()
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)

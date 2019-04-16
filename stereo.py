@@ -135,9 +135,9 @@ class Stereo:
         bp=bp*10
         pp=pp*10
         #too far from ball, keep doing current tracking and move closer
-        if bp[2]>1:
-            print("ball far, moving closer")
-            return 0
+        # if bp[2]>1:
+        #     print("ball far, moving closer")
+        #     return 0
         
         a=bp[0]-pp[0]
         b=bp[1]-pp[1]

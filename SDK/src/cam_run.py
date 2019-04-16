@@ -134,9 +134,10 @@ class Camera:
         cam.grab_img()
         r_img=cv2.imread(self.root_path+'right.jpg')
         l_img=cv2.imread(self.root_path+'left.jpg')
-        return (l_img,r_img)
-    
-    def yolo_draw_img(self,x, results):
+        return l_img,r_img
+
+    @staticmethod
+    def yolo_draw_img(x, results):
         c1 = tuple(x[1:3].int())
         c2 = tuple(x[3:5].int())
         img = results[int(x[0])]
@@ -148,8 +149,9 @@ class Camera:
         y=abs(y1-y2)/2+min(y1,y2)
         center=(int(x),int(y))
         return center
-    
-    def close_cam(self):
+
+    @staticmethod
+    def close_cam():
         cam.close_cam()
 
 '''
