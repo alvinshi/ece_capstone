@@ -3,6 +3,7 @@ from motor_control import Motor, DummyMotor
 from ultrasonic_control import Ultrasonic
 from stereo import Stereo
 import time
+import signal
 import numpy as np
 import json
 import sys
@@ -16,6 +17,7 @@ class RetrieverState(Enum):
     WAIT = "wait"
     TRACK = "track"
     CAPTURE = "capture"
+    PLAYER_SEARCH = "player_search"
     OFFER = "offer"
     RELEASE = "release"
     ERROR = "error"      
@@ -48,6 +50,7 @@ class Core:
         self.ball_center=0
         self.player_center=0
         self.max_unfound=projectDict["MAX_UNFOUND"]
+        self.max_player_unfound = projectDict["MAX_PLAYER_UNFOUND"]
         self.dist_thresh=projectDict["DIST_THRESHOLD"] #unit m
         #################
         #PID SETUP
@@ -145,13 +148,11 @@ class Core:
                     print("Track State: Tracking with {} {}".format(left_speed, right_speed))
             else:
                 num_not_found += 1
+                self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
                 print("Track State: Lost the ball for {} iterations".format(num_not_found))
                 if num_not_found >= self.max_unfound:
                     print("Track State: Permanent loss, transition to Search State")
                     return RetrieverState.SEARCH
-
-                if num_not_found == 1: # Only send idle speed command one time
-                    self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
 
                 ball_in = self.ultrasonic.measure()
                 if ball_in:
@@ -165,23 +166,63 @@ class Core:
 
         #To Confirm the ball is in
         if self.ultrasonic.measure():
-            print("Capture State: Successfully Captured")
+            print("Capture State: Successfully captured, transition to player_search state")
+            return RetrieverState.PLAYER_SEARCH
         else:
             self.motor.step_motor_up()
             print("Capture State: Failure, transition to search state")
             return RetrieverState.SEARCH
 
-        while True:
-            time.sleep(1)
-            # For now just hand in here
+    def player_search(self):
+        print('Player_Search State: Start Searching')
+        self.motor.stop()
+        self.motor.forward_gear()
+        self.motor.rotate_clockwise()
+        img = self.cam.grab_img()
+        player_center = self.cam.detect_player(img[0])
+
+        while player_center == 0:
+            img = self.cam.grab_img()
+            player_center = self.cam.detect_player(img[0])
+
+        print("Player_Search State: Player detected, transition to offer state")
+        self.motor.stop()
+        time.sleep(0.5)  # Sleep 0.5 second to protect the motor
         return RetrieverState.OFFER
 
     def offer(self):
-        # TODO
-        return RetrieverState.RELEASE
+        print('Offer State: Start approaching the player')
+        num_not_found = 0
+        pre_error = 0
+        while True:
+            img = self.cam.grab_img()
+            player_center = self.cam.detect_player(img[0])
+
+            if player_center != 0:
+                num_not_found = 0
+                # TODO: measure distance, go to release state if close enough
+                (left_speed, right_speed, pre_error) = self.__pid_speed(player_center, pre_error)
+                self.motor.set_speed(int(left_speed), int(right_speed))
+                print("Offer State: Approaching with {} {}".format(left_speed, right_speed))
+            else:
+                num_not_found += 1
+                self.motor.stop()
+                print("Offer State: Lost the player for {} iterations".format(num_not_found))
+                if num_not_found >= self.max_player_unfound:
+                    print("Offer State: Permanent loss, transition to Player_Search State")
+                    return RetrieverState.PLAYER_SEARCH
 
     def release(self):
-        # TODO
+        print('Release State: Start release')
+        self.motor.stop()
+        self.motor.step_motor_up()
+        self.motor.reverse_gear()
+        self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
+        time.sleep(3)
+        self.motor.stop()
+        self.motor.forward_gear()
+        time.sleep(1) # Protect the motor
+        print('Release State: Release done, return to search state')
         return RetrieverState.SEARCH
 
     def error(self):
@@ -208,7 +249,16 @@ class Core:
         return left_speed, right_speed, error
 
 def main():
-    Core().run()
+    core = Core()
+
+    def signal_handler(*args):
+        print('You pressed Ctrl+C!')
+        core.motor.stop()
+        core.motor.step_motor_down()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+    core.run()
 
 if __name__ == "__main__":
     main()

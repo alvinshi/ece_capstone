@@ -16,10 +16,10 @@ class Motor:
         time.sleep(2) # sleep is required for the motor to have enough set up time, reason unclear
         if lift_gate:
             print("Motor Init: Step motor up")
-            self.step_motor_up()
+            self.step_motor_up(True)
         if drop_gate:
             print("Motor Init: Step motor down")
-            self.step_motor_down()
+            self.step_motor_down(True)
 
     @staticmethod
     def __format_serial_speed_input(speed):
@@ -32,6 +32,10 @@ class Motor:
         self.ser.write(bytes(serial_command, 'utf-8'))
 
     def set_speed(self, left, right):
+        # Corner case, do not send same speed
+        if self.left_speed == left and self.right_speed == right:
+            return
+
         self.left_speed = left
         self.right_speed = right
         left = left * self.gear
@@ -78,15 +82,15 @@ class Motor:
     def rotate_clockwise(self):
         self.__force_set_speed(-self.ROTATE_SPEED, self.ROTATE_SPEED)
 
-    def step_motor_up(self):
-        if self.gate_open:
+    def step_motor_up(self, force_open=False):
+        if self.gate_open and not force_open:
             return
         else:
             self.ser.write(bytes("U", 'utf-8'))
             self.gate_open = True
 
-    def step_motor_down(self):
-        if self.gate_open:
+    def step_motor_down(self, force_close=False):
+        if self.gate_open or force_close:
             self.ser.write(bytes("D", 'utf-8'))
             self.gate_open = False
         else:

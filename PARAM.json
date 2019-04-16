@@ -12,6 +12,7 @@
     
     "DIST_THRESHOLD":1,
     "MAX_UNFOUND":30,
+    "MAX_PLAYER_UNFOUND":3,
     
     "BATCH_SIZE":1,
     "CONFIDENCE":0.9,
