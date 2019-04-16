@@ -4,6 +4,7 @@ import math
 import json
 import time
 from matplotlib import pyplot as plt
+
 class Stereo:
     def __init__(self,projectDict):
         ##############
@@ -51,9 +52,66 @@ class Stereo:
                                           speckleWindowSize=speckleWindowSize,
                                           speckleRange=speckleRange,
                                           )
+    
+    #return dist or 0 to keep tracking                                   
+    def measure_player_dist(self,img_pair,player_center):
+        if player_center==0:
+            print("invalid player center value")
+            return 0
+        img_left=img_pair[0]
+        img_right=img_pair[1]
+        img_left_rect=cv2.remap(img_left, self.Map_Left_1, self.Map_Left_2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+        img_right_rect=cv2.remap(img_right, self.Map_Right_1, self.Map_Right_2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+        imgl = cv2.cvtColor(img_left_rect, cv2.COLOR_BGR2GRAY)
+        imgr = cv2.cvtColor(img_right_rect, cv2.COLOR_BGR2GRAY)
+
+        disparity = self.stereo.compute(imgl,imgr)
+        points=cv2.reprojectImageTo3D(disparity,self.Q,handleMissingValues=True)
         
+        (p_x,p_y)=player_center
+        pp=points[p_y][p_x]
+
+        if pp[2]>100: #out of range
+            print("got invalid player dist")
+            return 0 
+        #units in m
+        pp=pp*10
+        #point to point distance
+        dist=math.sqrt(math.pow(pp[0],2)+math.pow(pp[1],2)+math.pow(pp[2],2))
+        return dist
+    
+    #return dist or 0 to keep tracking
+    def measure_ball_dist(self,img_pair,ball_center):
+        if ball_center==0:
+            print("invalid ball center value")
+            return 0
+        img_left=img_pair[0]
+        img_right=img_pair[1]
+        img_left_rect=cv2.remap(img_left, self.Map_Left_1, self.Map_Left_2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+        img_right_rect=cv2.remap(img_right, self.Map_Right_1, self.Map_Right_2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+        imgl = cv2.cvtColor(img_left_rect, cv2.COLOR_BGR2GRAY)
+        imgr = cv2.cvtColor(img_right_rect, cv2.COLOR_BGR2GRAY)
+
+        disparity = self.stereo.compute(imgl,imgr)
+        points=cv2.reprojectImageTo3D(disparity,self.Q,handleMissingValues=True)
+        
+        (b_x,b_y)=ball_center
+        bp=points[b_y][b_x]
+
+        if bp[2]>100: #out of range
+            print("got invalid ball dist")
+            return 0 
+        #units in m
+        bp=bp*10
+        #point to point distance
+        dist=math.sqrt(math.pow(bp[0],2)+math.pow(bp[1],2)+math.pow(bp[2],2))
+        return dist
+    
+    #return dist or 0 to keep tracking   
     def measure_dist(self, img_pair,ball_center,player_center):
-        if(player_center==0 or ball_center==0): #no need to measure dist
+        #no need to measure dist, missing one obj
+        if player_center==0 or ball_center==0: 
+            print("invalid obj center value")
             return 0
         img_left=img_pair[0]
         img_right=img_pair[1]
@@ -71,20 +129,20 @@ class Stereo:
         bp=points[b_y][b_x]
 
         if bp[2]>100 or pp[2]>100: #out of range
+            print("got invalid dist")
             return 0 
         #units in m
         bp=bp*10
         pp=pp*10
-        #too far from ball, move closer
+        #too far from ball, keep doing current tracking and move closer
         if bp[2]>1:
-            print("ball far")
+            print("ball far, moving closer")
             return 0
         
         a=bp[0]-pp[0]
         b=bp[1]-pp[1]
         c=bp[2]-pp[2]
         dist=math.sqrt(math.pow(a,2)+math.pow(b,2)+math.pow(c,2))
-        print(dist)
         #plt.imshow(disparity,'gray')
         #plt.show()
         return dist

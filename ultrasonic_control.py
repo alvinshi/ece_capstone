@@ -3,7 +3,7 @@ import time
 
 class Ultrasonic:
     def __init__(self):
-        self.ser = serial.Serial("/dev/ttyACM2", 9600)
+        self.ser = serial.Serial("/dev/ttyACM1", 9600)
         print(self.ser.readline())
 
     def measure(self):
