@@ -78,6 +78,7 @@ class Stereo:
         pp=pp*10
         #point to point distance
         dist=math.sqrt(math.pow(pp[0],2)+math.pow(pp[1],2)+math.pow(pp[2],2))
+        print("Player distance {}".format(dist))
         return dist
     
     #return dist or 0 to keep tracking
@@ -127,8 +128,9 @@ class Stereo:
         pp=points[p_y][p_x]   
         (b_x,b_y)=ball_center
         bp=points[b_y][b_x]
-
-        if bp[2]>100 or pp[2]>100: #out of range
+        #plt.imshow(disparity,'gray')
+        #plt.show()
+        if bp[2]>1000 or pp[2]>1000: #out of range
             print("got invalid dist")
             return 0 
         #units in m
@@ -143,6 +145,6 @@ class Stereo:
         b=bp[1]-pp[1]
         c=bp[2]-pp[2]
         dist=math.sqrt(math.pow(a,2)+math.pow(b,2)+math.pow(c,2))
-        #plt.imshow(disparity,'gray')
-        #plt.show()
+        
+        print("ball to player distance {}".format(dist))
         return dist

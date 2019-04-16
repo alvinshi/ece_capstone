@@ -8,7 +8,7 @@ Ultrasonic ultrasonic1(trigPin1, echoPin1, 40000UL); //Using a 40ms timeout shou
 Ultrasonic ultrasonic2(trigPin2, echoPin2, 40000UL);
 
 int sample_size = 10; //set avg sampling size
-int detection_threshold = 18;
+int detection_threshold = 15;
 long cm1, cm2;
 long sum1,sum2;
 int max1,max2,min1,min2;

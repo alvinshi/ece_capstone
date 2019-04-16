@@ -87,12 +87,14 @@ class Motor:
             return
         else:
             self.ser.write(bytes("U", 'utf-8'))
+            time.sleep(15)
             self.gate_open = True
 
     def step_motor_down(self, force_close=False):
         if self.gate_open or force_close:
             self.ser.write(bytes("D", 'utf-8'))
             self.gate_open = False
+            time.sleep(15)
         else:
             return
 

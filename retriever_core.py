@@ -105,6 +105,7 @@ class Core:
 
     def wait(self):
         print("Wait State: Start Waiting")
+        loss_count = 0
         while True:
             img = self.cam.grab_img()
             ball_center = self.cam.detect_ball(img[0])
@@ -122,8 +123,10 @@ class Core:
                     print("Wait State: Ball out of control, transition to Wait State")
                     return RetrieverState.TRACK
             elif ball_center == 0:
-                print("Wait State: Lost track of the ball, transition to Search State")
-                return RetrieverState.SEARCH
+                loss_count+=1
+                if loss_count > 3:
+                    print("Wait State: Lost track of the ball, transition to Search State")
+                    return RetrieverState.SEARCH
 
     def track(self):
         print('Track State: Start Tracking')
