@@ -1,0 +1,8 @@
+PLUG IN ORDER:
+1. Plug in camera to upper left usb.
+2. Plug in motor to right usb.
+3. Plug in ultrasonic to lower left usb.
+
+Things to Check:
+1. Motor enabled in PARAM.json
+
