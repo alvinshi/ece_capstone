@@ -267,6 +267,7 @@ def main():
         core.motor.stop()
         core.motor.step_motor_down()
         core.cam.close_cam()
+        time.sleep(5)
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)

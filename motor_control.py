@@ -5,6 +5,7 @@ class Motor:
     MAXIMUM_SPEED = 400
     MINIMUM_SPEED = 0
     ROTATE_SPEED = 70
+    STEP_MOTOR_SLEEP = 12
 
     def __init__(self, lift_gate=False, drop_gate=False):
         self.ser = serial.Serial("/dev/ttyACM0", 9600, write_timeout=0) #try write_timeout=0
@@ -87,14 +88,14 @@ class Motor:
             return
         else:
             self.ser.write(bytes("U", 'utf-8'))
-            time.sleep(15)
+            time.sleep(self.STEP_MOTOR_SLEEP)
             self.gate_open = True
 
     def step_motor_down(self, force_close=False):
         if self.gate_open or force_close:
             self.ser.write(bytes("D", 'utf-8'))
             self.gate_open = False
-            time.sleep(15)
+            time.sleep(self.STEP_MOTOR_SLEEP)
         else:
             return
 
