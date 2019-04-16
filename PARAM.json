@@ -21,7 +21,7 @@
     "ROOT_PATH":"/home/wayne/Capstone/ece_capstone/SDK/build/",
     "OBJ_NAME_PATH":"/home/wayne/Capstone/ece_capstone/SDK/data/obj.names",
     "CFG_PATH":"/home/wayne/Capstone/ece_capstone/SDK/cfg/yolo-obj.cfg",
-    "WEIGHTS_PATH":"/home/wayne/Capstone/ece_capstone/SDK/yolo-obj_15000.weights",
+    "WEIGHTS_PATH":"/home/wayne/Capstone/ece_capstone/SDK/yolo-obj_15300.weights",
     
     
 	"LEFT_MTX":[[462.08283883, 0, 401.32424479],
