@@ -229,7 +229,7 @@ class Core:
         self.motor.step_motor_up()
         self.motor.reverse_gear()
         self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
-        time.sleep(3)
+        time.sleep(5)
         self.motor.stop()
         self.motor.forward_gear()
         time.sleep(1) # Protect the motor
