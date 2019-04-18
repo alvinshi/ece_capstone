@@ -2,10 +2,11 @@
     "VISUALIZE":0,
     "MOVE":1,
     
-    "KP":1.5,
+    "KP":1,
     "KD":0,
+    "KI":0,
     "BASE_SPEED":100,
-    "MAX_SPEED":150,
+    "MAX_SPEED":200,
     "MIN_SPEED":100,
     "IDLE_SPEED":70,
     "IMG_CENTER_X":390,

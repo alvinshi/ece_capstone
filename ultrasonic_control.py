@@ -3,7 +3,7 @@ import time
 
 class UltrasonicAndLED:
     def __init__(self):
-        self.ser = serial.Serial("/dev/tty.usbmodem14201", 9600)
+        self.ser = serial.Serial("/dev/ttyACM1", 9600, write_timeout=0)
         #self.ser = serial.Serial("/dev/ttyACM1", 9600)
         print(self.ser.readline())
 

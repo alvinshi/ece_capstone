@@ -106,6 +106,7 @@ void loop()
           leds_2[i] = CRGB::Black;
         }
       }
+      FastLED.show();
       prev_mode = mode;
       mode = get_next_mode(mode);
       break;

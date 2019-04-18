@@ -28,6 +28,8 @@ class Motor:
 
     # Ignore the internal safety
     def __force_set_speed(self, left, right):
+        self.left_speed = left
+        self.right_speed = right
         serial_command = "M{}{}".format(Motor.__format_serial_speed_input(left),
                                         Motor.__format_serial_speed_input(right))
         self.ser.write(bytes(serial_command, 'utf-8'))

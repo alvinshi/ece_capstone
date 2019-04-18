@@ -59,6 +59,7 @@ class Core:
         #################
         self.KP=projectDict["KP"]
         self.KD=projectDict["KD"]
+        self.KI=projectDict["KI"]
         self.BASE_SPEED=projectDict["BASE_SPEED"]
         self.MAX_SPEED=projectDict["MAX_SPEED"] #400
         self.MIN_SPEED=projectDict["MIN_SPEED"] #-400
@@ -135,6 +136,7 @@ class Core:
         self.ultra_led.to_track()
         num_not_found = 0
         pre_error = 0
+        total_error = 0
         while True:
             img = self.cam.grab_img()
             ball_center = self.cam.detect_ball(img[0])
@@ -150,17 +152,18 @@ class Core:
                         self.motor.stop()
                         return RetrieverState.WAIT
                     else:
-                        (left_speed, right_speed, pre_error) = self.__pid_speed(ball_center, pre_error)
+                        (left_speed, right_speed, pre_error, total_error) = self.__pid_speed(ball_center, pre_error, total_error)
                         self.motor.set_speed(int(left_speed), int(right_speed))
                         print("Track State: Tracking with {} {}".format(left_speed, right_speed))
                 else:
-                    (left_speed, right_speed, pre_error) = self.__pid_speed(ball_center, pre_error)
+                    (left_speed, right_speed, pre_error, total_error) = self.__pid_speed(ball_center, pre_error, total_error)
                     self.motor.set_speed(int(left_speed), int(right_speed))
                     print("Track State: Tracking with {} {}".format(left_speed, right_speed))
             else:
                 num_not_found += 1
-                self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
                 print("Track State: Lost the ball for {} iterations".format(num_not_found))
+                self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
+                print("Track State: Set speed after lost")
                 if num_not_found >= self.max_unfound:
                     print("Track State: Permanent loss, transition to Search State")
                     return RetrieverState.SEARCH
@@ -208,6 +211,7 @@ class Core:
         print('Offer State: Start approaching the player')
         num_not_found = 0
         pre_error = 0
+        total_error=0
         while True:
             img = self.cam.grab_img()
             player_center = self.cam.detect_player(img[0])
@@ -221,7 +225,7 @@ class Core:
                     print("Offer State: Close enough, transition to the player state")
                     return RetrieverState.RELEASE
 
-                (left_speed, right_speed, pre_error) = self.__pid_speed(player_center, pre_error)
+                (left_speed, right_speed, pre_error, total_error) = self.__pid_speed(player_center, pre_error, total_error)
                 self.motor.set_speed(int(left_speed), int(right_speed))
                 print("Offer State: Approaching with {} {} distance: {}".format(left_speed, right_speed,player_distance))
             else:
@@ -235,12 +239,18 @@ class Core:
     def release(self):
         print('Release State: Start release')
         self.motor.stop()
+        print("Release State: Motor stopped")
         self.motor.step_motor_up()
+        print("Release State: Step Motor up")
         self.motor.reverse_gear()
+        print("Release State: Motor set to reverse")
         self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
+        print("Release State: Motor set to idle")
         time.sleep(5)
         self.motor.stop()
+        print("Release State: Motor stopped")
         self.motor.forward_gear()
+        print("Release State: Motor set to forward")
         time.sleep(1) # Protect the motor
         print('Release State: Release done, return to search state')
         return RetrieverState.SEARCH
@@ -250,12 +260,12 @@ class Core:
         while True:
             print("ERROR!!!!!!")
 
-    def __pid_speed(self, ball_center, error):
+    def __pid_speed(self, ball_center, error,total_error):
         (ball_x, ball_y) = ball_center
         pre_error = error
         error = ball_x - self.CENTER_X
-
-        d_speed = self.KP * error + self.KD * (error - pre_error)
+        sum_error=total_error+error
+        d_speed = self.KP * error + self.KD * (error - pre_error) + self.KI * sum_error
         right_speed = self.BASE_SPEED - d_speed
         left_speed = self.BASE_SPEED + d_speed
         if right_speed > self.MAX_SPEED:
@@ -266,7 +276,7 @@ class Core:
             left_speed = self.MAX_SPEED
         elif left_speed < self.MIN_SPEED:
             left_speed = self.MIN_SPEED
-        return left_speed, right_speed, error
+        return left_speed, right_speed, error,sum_error
 
 def main():
     core = Core()

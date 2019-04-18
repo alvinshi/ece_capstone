@@ -64,10 +64,10 @@ void loop()
       delay(200);
       myStepper.step(stepsPerRevolution);
       delay(200);
-      myStepper.step(stepsPerRevolution);
-      delay(200);
-      myStepper.step(stepsPerRevolution);
-      delay(200);
+      //myStepper.step(stepsPerRevolution);
+      //delay(200);
+      //myStepper.step(stepsPerRevolution);
+      //delay(200);
     }
     else if (input == 'U') {
       myStepper.step(-stepsPerRevolution);
@@ -76,10 +76,10 @@ void loop()
       delay(200);
       myStepper.step(-stepsPerRevolution);
       delay(200);
-      myStepper.step(-stepsPerRevolution);
-      delay(200);
-      myStepper.step(-stepsPerRevolution);
-      delay(200);
+      //myStepper.step(-stepsPerRevolution);
+      //delay(200);
+      //myStepper.step(-stepsPerRevolution);
+      //delay(200);
     }
   }
 }
