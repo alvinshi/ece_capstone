@@ -1,9 +1,10 @@
 import serial
 import time
 
-class Ultrasonic:
+class UltrasonicAndLED:
     def __init__(self):
-        self.ser = serial.Serial("/dev/ttyACM1", 9600)
+        self.ser = serial.Serial("/dev/tty.usbmodem14201", 9600)
+        #self.ser = serial.Serial("/dev/ttyACM1", 9600)
         print(self.ser.readline())
 
     def measure(self):
@@ -11,18 +12,29 @@ class Ultrasonic:
         result = self.ser.readline()
         return int(result) == 1
 
+    def to_wait(self):
+        self.ser.write(bytes("W", 'utf-8'))
+
+    def to_track(self):
+        self.ser.write(bytes("T", 'utf-8'))
+
     def close(self):
         self.ser.close()
 
 def test():
-    ultra = Ultrasonic()
-    count = 0
-    while count < 20:
-        print(ultra.measure())
-        print("here")
+    ultra = UltrasonicAndLED()
+    time.sleep(2)
+    ultra.to_track()
+    time.sleep(2)
+    ultra.to_wait()
+    time.sleep(2)
+    ultra.to_track()
+    time.sleep(2)
+    for x in range(10):
+        ultra.measure()
         time.sleep(1)
-        count+=1
-    ultra.close()
+    ultra.to_wait()
+
 
 if __name__ == "__main__":
     test()

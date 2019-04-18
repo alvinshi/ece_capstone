@@ -1,6 +1,6 @@
 from enum import Enum
 from motor_control import Motor, DummyMotor
-from ultrasonic_control import Ultrasonic
+from ultrasonic_control import UltrasonicAndLED
 from stereo import Stereo
 
 import time
@@ -67,7 +67,7 @@ class Core:
         self.CENTER_X=projectDict["IMG_CENTER_X"] #center of image
 
         # Ultrasonic
-        self.ultrasonic = Ultrasonic()
+        self.ultra_led = UltrasonicAndLED()
 
     def run(self):
         while True:
@@ -77,6 +77,7 @@ class Core:
 
     def search(self):
         print('Search State: Start Searching')
+        self.ultra_led.to_wait()
         self.motor.stop()
         self.motor.forward_gear()
         self.motor.rotate_clockwise()
@@ -105,6 +106,7 @@ class Core:
 
     def wait(self):
         print("Wait State: Start Waiting")
+        self.ultra_led.to_wait()
         loss_count = 0
         while True:
             img = self.cam.grab_img()
@@ -130,6 +132,7 @@ class Core:
 
     def track(self):
         print('Track State: Start Tracking')
+        self.ultra_led.to_track()
         num_not_found = 0
         pre_error = 0
         while True:
@@ -162,7 +165,7 @@ class Core:
                     print("Track State: Permanent loss, transition to Search State")
                     return RetrieverState.SEARCH
 
-                ball_in = self.ultrasonic.measure()
+                ball_in = self.ultra_led.measure()
                 if ball_in:
                     self.motor.stop()
                     print("Track State: Ball in, transition to Capture State")
@@ -171,15 +174,18 @@ class Core:
     def capture(self):
         print("Capture State: Start Capturing")
         self.motor.step_motor_down()
+        print("Capture State: Successfully captured, transition to player_search state")
+        return RetrieverState.PLAYER_SEARCH
 
         #To Confirm the ball is in
-        if self.ultrasonic.measure():
-            print("Capture State: Successfully captured, transition to player_search state")
-            return RetrieverState.PLAYER_SEARCH
-        else:
-            self.motor.step_motor_up()
-            print("Capture State: Failure, transition to search state")
-            return RetrieverState.SEARCH
+        # TODO: incompatible with led control
+        # if self.ultra_led.measure():
+        #     print("Capture State: Successfully captured, transition to player_search state")
+        #     return RetrieverState.PLAYER_SEARCH
+        # else:
+        #     self.motor.step_motor_up()
+        #     print("Capture State: Failure, transition to search state")
+        #     return RetrieverState.SEARCH
 
     def player_search(self):
         print('Player_Search State: Start Searching')
