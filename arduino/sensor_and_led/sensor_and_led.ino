@@ -132,6 +132,7 @@ void loop()
       }
       prev_mode = mode;
       mode = get_next_mode(mode);
+      break;
     case 3:
       if (mode != prev_mode) {
         for (int i = 0; i < NUM_LEDS; i++) {
@@ -139,8 +140,8 @@ void loop()
           leds_2[i] = CRGB::Blue;
         }
         FastLED.show();
-        prev_mode = mode;
-        mode = get_next_mode(mode);
       }
+      prev_mode = mode;
+      mode = get_next_mode(mode);
    }
 }

@@ -93,7 +93,7 @@ class Core:
 
         print("Search State: Ball Detected")
         self.motor.stop()
-        time.sleep(0.5) #Sleep 0.5 second to protect the motor
+        time.sleep(1) #Sleep 1 second to protect the motor
 
         # Check if the player is around
         player_center = self.cam.detect_player(img[0])
@@ -120,11 +120,12 @@ class Core:
             if ball_center != 0:
                 if player_center != 0:
                     distance = self.stereo.measure_dist(img, ball_center, player_center)
-                    if distance > self.dist_thresh or distance == 0:
-                        print("Wait State: Ball is far enough from the player, transition to Wait State")
+                    if distance > self.dist_thresh:
+                    # if distance > self.dist_thresh or distance == 0:
+                        print("Wait State: Ball is far enough from the player, transition to Track State")
                         return RetrieverState.TRACK
                 else:
-                    print("Wait State: Ball out of control, transition to Wait State")
+                    print("Wait State: Ball out of control, transition to Track State")
                     return RetrieverState.TRACK
             elif ball_center == 0:
                 loss_count+=1
@@ -139,16 +140,15 @@ class Core:
         pre_error = 0
         total_error = 0
         while True:
-            print('Track State: Processing Image')
             img = self.cam.grab_img()
             ball_center = self.cam.detect_ball(img[0])
             player_center = self.cam.detect_player(img[0])
-            print('Track State: Image Process Done')
             if self.vis:
                 self.cam.display_img(ball_center,player_center,img[0])
-            if ball_center != 0:
+
+            if ball_center != 0: # Ball found
                 num_not_found = 0
-                if player_center != 0:
+                if player_center != 0: # Player in the scope
                     distance = self.stereo.measure_dist(img, ball_center, player_center)
                     if distance < self.dist_thresh and distance != 0:
                         print("Track State: Ball back in control, transition Wait State")
@@ -158,11 +158,11 @@ class Core:
                         (left_speed, right_speed, pre_error) = self.__pid_speed(ball_center, pre_error)
                         self.motor.set_speed(int(left_speed), int(right_speed))
                         print("Track State: Tracking with {} {}".format(left_speed, right_speed))
-                else:
+                else: # Player not in the scope
                     (left_speed, right_speed, pre_error) = self.__pid_speed(ball_center, pre_error)
                     self.motor.set_speed(int(left_speed), int(right_speed))
                     print("Track State: Tracking with {} {}".format(left_speed, right_speed))
-            else:
+            else: # Lose ball
                 num_not_found += 1
                 print("Track State: Lost the ball for {} iterations".format(num_not_found))
                 self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
@@ -196,12 +196,8 @@ class Core:
     def player_search(self):
         print('Player_Search State: Start Searching')
         self.motor.stop()
-        time.sleep(1)
-        print("Player_Search: Motor stopped")
         self.motor.forward_gear()
-        print("Player_Search: forward gear")
         self.motor.set_speed(100, 0)
-        print("Player_Search: set speed")
         img = self.cam.grab_img()
         player_center = self.cam.detect_player(img[0])
 
@@ -211,7 +207,6 @@ class Core:
 
         print("Player_Search State: Player detected, transition to offer state")
         self.motor.stop()
-        time.sleep(0.5)  # Sleep 0.5 second to protect the motor
         return RetrieverState.OFFER
 
     def offer(self):
@@ -223,18 +218,18 @@ class Core:
             img = self.cam.grab_img()
             player_center = self.cam.detect_player(img[0])
 
-            if player_center != 0:
+            if player_center != 0: # Player in scope
                 num_not_found = 0
                 player_distance = self.stereo.measure_player_dist(img, player_center)
           
                 if player_distance < self.OFFER_THRESHOD and player_distance != 0:
-                    print("Offer State: Close enough, transition to the player state")
+                    print("Offer State: Close enough, transition to the release state")
                     return RetrieverState.RELEASE
 
                 (left_speed, right_speed, pre_error) = self.__pid_speed(player_center, pre_error)
                 self.motor.set_speed(int(left_speed), int(right_speed))
                 print("Offer State: Approaching with {} {} distance: {}".format(left_speed, right_speed,player_distance))
-            else:
+            else: # Lost Player
                 num_not_found += 1
                 self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
                 print("Offer State: Lost the player for {} iterations".format(num_not_found))
@@ -245,20 +240,13 @@ class Core:
     def release(self):
         print('Release State: Start release')
         self.motor.stop()
-        time.sleep(1)
-        print("Release State: Motor stopped")
         self.motor.step_motor_up()
-        print("Release State: Step Motor up")
         self.motor.reverse_gear()
-        print("Release State: Motor set to reverse")
         self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
-        print("Release State: Motor set to idle")
         time.sleep(5)
         self.motor.stop()
-        print("Release State: Motor stopped")
         self.motor.forward_gear()
-        print("Release State: Motor set to forward")
-        time.sleep(1) # Protect the motor
+        time.sleep(5) # One loop done, take a break
         print('Release State: Release done, return to search state')
         return RetrieverState.SEARCH
 
@@ -291,10 +279,11 @@ def main():
 
     def signal_handler(*args):
         print('You pressed Ctrl+C!')
+        core.ultra_led.to_wait()
         core.motor.stop()
         core.motor.step_motor_down()
         core.cam.close_cam()
-        time.sleep(5)
+        print('System exit')
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)

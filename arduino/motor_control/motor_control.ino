@@ -1,6 +1,8 @@
 #include "DualVNH5019MotorShield.h"
 #include <Stepper.h>
 
+#define ERROR_CODE 9999
+
 DualVNH5019MotorShield md;
 char input;
 char BUFFER[5];
@@ -24,12 +26,18 @@ void stopIfFault()
   }
 }
 
+bool isLegalInput(char input) {
+  if ((input - '0' >= 0) && (input - '0' <= 9)) return true;
+  return input == '-';
+}
+
 int intParse()
 {    
   for(byte i = 0; i < 4; i++) {
     while (Serial.available() == 0); //Blocking read
-    BUFFER[i] = Serial.read(); 
-  } 
+    BUFFER[i] = Serial.read();
+    if (!isLegalInput(BUFFER[i])) return ERROR_CODE;
+  }
   BUFFER[4] = 0;
   return atoi(BUFFER);
 }
@@ -51,11 +59,12 @@ void loop()
       int m1speed = intParse();
       Serial.print("Set M1 speed to: ");
       Serial.println(m1speed);
+      if (m1speed == ERROR_CODE) continue;
       int m2speed = intParse();
       Serial.print("Set M2 speed to: ");
       Serial.println(m2speed);
+      if (m2speed == ERROR_CODE) continue;
       md.setSpeeds(m1speed, m2speed);
-      stopIfFault();
     }
     else if (input == 'D') {
       myStepper.step(stepsPerRevolution);
