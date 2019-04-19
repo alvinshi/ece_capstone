@@ -139,9 +139,11 @@ class Core:
         pre_error = 0
         total_error = 0
         while True:
+            print('Track State: Processing Image')
             img = self.cam.grab_img()
             ball_center = self.cam.detect_ball(img[0])
             player_center = self.cam.detect_player(img[0])
+            print('Track State: Image Process Done')
             if self.vis:
                 self.cam.display_img(ball_center,player_center,img[0])
             if ball_center != 0:
