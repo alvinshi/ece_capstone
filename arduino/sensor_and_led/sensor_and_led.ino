@@ -1,7 +1,7 @@
 #include <Ultrasonic.h>
 #include <FastLED.h>
 
-// 0 wait, 1 track, 2 approach, 3 captured
+// 0 wait, 1 track, 2 approach, 3 detected
 int prev_mode = -1;
 int mode = 0;
 
@@ -136,8 +136,8 @@ void loop()
     case 3:
       if (mode != prev_mode) {
         for (int i = 0; i < NUM_LEDS; i++) {
-          leds_1[i] = CRGB::Blue;
-          leds_2[i] = CRGB::Blue;
+          leds_1[i] = CRGB(250,60,0); // Light green, object order, GRB
+          leds_2[i] = CRGB(250,60,0);
         }
         FastLED.show();
       }
