@@ -1,9 +1,21 @@
 #include <Ultrasonic.h>
 #include <FastLED.h>
 
+
+enum state {
+  WAIT,
+  TRACK,
+  APPROACH,
+  DETECTED,
+  PLAYER_SEARCH,
+  GO_PLAYER,
+  RETURN,
+  INIT
+};
+
 // 0 wait, 1 track, 2 approach, 3 detected
-int prev_mode = -1;
-int mode = 0;
+state prev_mode = INIT;
+state mode = WAIT;
 
 // Ultrasonic Sensor Setup
 int trigPin1 = 9;
@@ -12,6 +24,8 @@ int trigPin2 = 11;
 int echoPin2 = 12; 
 Ultrasonic ultrasonic1(trigPin1, echoPin1, 40000UL); //Using a 40ms timeout should give you a maximum range of approximately 6.8m.
 Ultrasonic ultrasonic2(trigPin2, echoPin2, 40000UL);
+
+bool player_search_light_on = false;
 
 int sample_size = 10; //set avg sampling size
 int detection_threshold = 10;
@@ -71,24 +85,37 @@ bool measure() {
   }
 }
 
-int get_next_mode(int current_mode) {
+state get_next_mode(state current_mode) {
   if (Serial.available() > 0) {
     char input = Serial.read();
     if (input == 'M') {
       if (measure()) {
         Serial.println("1");
-        return 3;
+        return DETECTED;
       }
       else {
         Serial.println("0");
-        return 2;
+        return APPROACH;
       }
     }
     else if (input == 'T') {
-      return 1;
+      return TRACK;
     }
     else if (input == 'W') {
-      return 0;
+      return WAIT;
+    }
+    else if (input == 'P') {
+      return PLAYER_SEARCH;
+    }
+    else if (input == 'G') {
+      return PLAYER_APPROACH;
+    }
+    else if (input == 'R') {
+      return RETURN;
+    }
+    else {
+      // should not happen
+      return current_mode;
     }
   }
   else {
@@ -99,7 +126,7 @@ int get_next_mode(int current_mode) {
 void loop()
 {
    switch (mode) {
-    case 0:
+    case WAIT: // Wait state, lights off
       if (mode != prev_mode) {
         for (int i = 0; i < NUM_LEDS; i++) {
           leds_1[i] = CRGB::Black;
@@ -110,7 +137,7 @@ void loop()
       prev_mode = mode;
       mode = get_next_mode(mode);
       break;
-    case 1:
+    case TRACK: // Track state, flowing white lights
       for (int i = 0; i < NUM_LEDS; i++) {
         leds_1[i] = CRGB::White;
         leds_2[i] = CRGB::White;
@@ -122,7 +149,7 @@ void loop()
       prev_mode = mode;
       mode = get_next_mode(mode);
       break;
-    case 2:
+    case APPROACH: // Approach state, white lights fully on
       if (mode != prev_mode) {
         for (int i = 0; i < NUM_LEDS; i++) {
           leds_1[i] = CRGB::White;
@@ -133,11 +160,55 @@ void loop()
       prev_mode = mode;
       mode = get_next_mode(mode);
       break;
-    case 3:
+    case DETECTED: // Detect state, green lights fully on
       if (mode != prev_mode) {
         for (int i = 0; i < NUM_LEDS; i++) {
           leds_1[i] = CRGB(250,60,0); // Light green, object order, GRB
           leds_2[i] = CRGB(250,60,0);
+        }
+        FastLED.show();
+      }
+      prev_mode = mode;
+      mode = get_next_mode(mode);
+      break;
+   case PLAYER_SEARCH: // Player search state, flashing white lights
+     if (player_search_light_on) {
+       for (int i = 0; i < NUM_LEDS; i++) {
+         leds_1[i] = CRGB::Black;
+         leds_2[i] = CRGB::Black;
+       }
+       FastLED.show();
+       player_search_light_on = false;
+     }
+     else {
+       for (int i = 0; i < NUM_LEDS; i++) {
+         leds_1[i] = CRGB::White;
+         leds_2[i] = CRGB::White;
+       }
+       FastLED.show();
+       player_search_light_on = true;
+     }
+     delay(300);
+     prev_mode = mode;
+     mode = get_next_mode(mode);
+     break;
+  case GO_PLAYER: // Player Approach state, flowing white lights
+      for (int i = 0; i < NUM_LEDS; i++) {
+        leds_1[i] = CRGB::White;
+        leds_2[i] = CRGB::White;
+        FastLED.show();
+        delay(100);
+        leds_1[i] = CRGB::Black;
+        leds_2[i] = CRGB::Black;
+      }
+      prev_mode = mode;
+      mode = get_next_mode(mode);
+      break;
+  case RETURN: // return state, blue lights fully on
+      if (mode != prev_mode) {
+        for (int i = 0; i < NUM_LEDS; i++) {
+          leds_1[i] = CRGB::Blue;
+          leds_2[i] = CRGB::Blue;
         }
         FastLED.show();
       }

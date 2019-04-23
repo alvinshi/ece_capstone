@@ -22,6 +22,15 @@ class UltrasonicAndLED:
     def to_track(self):
         self.ser.write(bytes("T", 'utf-8'))
 
+    def to_player_search(self):
+        self.ser.write(bytes("P", 'utf-8'))
+
+    def to_player_approach(self):
+        self.ser.write(bytes("G", 'utf-8'))
+
+    def to_return(self):
+        self.ser.write(bytes("R", 'utf-8'))
+
     def close(self):
         self.ser.close()
 

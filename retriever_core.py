@@ -1,6 +1,6 @@
 from enum import Enum
 from motor_control import Motor, DummyMotor
-from ultrasonic_control import UltrasonicAndLED
+from ultrasonic_led_control import UltrasonicAndLED
 from stereo import Stereo
 
 import time
@@ -195,6 +195,7 @@ class Core:
 
     def player_search(self):
         print('Player_Search State: Start Searching')
+        self.ultra_led.to_player_search()
         self.motor.stop()
         self.motor.forward_gear()
         self.motor.set_speed(100, 0)
@@ -210,6 +211,7 @@ class Core:
         return RetrieverState.OFFER
 
     def offer(self):
+        self.ultra_led.to_player_approach()
         print('Offer State: Start approaching the player')
         num_not_found = 0
         pre_error = 0
@@ -239,6 +241,7 @@ class Core:
 
     def release(self):
         print('Release State: Start release')
+        self.ultra_led.to_return()
         self.motor.stop()
         self.motor.step_motor_up()
         self.motor.reverse_gear()
