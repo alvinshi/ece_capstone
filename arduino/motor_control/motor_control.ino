@@ -57,13 +57,13 @@ void loop()
     char input = Serial.read();
     if (input == 'M') {
       int m1speed = intParse();
-      Serial.print("Set M1 speed to: ");
-      Serial.println(m1speed);
-      if (m1speed == ERROR_CODE) continue;
+      //Serial.print("Set M1 speed to: ");
+      //Serial.println(m1speed);
+      if (m1speed == ERROR_CODE) return;
       int m2speed = intParse();
-      Serial.print("Set M2 speed to: ");
-      Serial.println(m2speed);
-      if (m2speed == ERROR_CODE) continue;
+      //Serial.print("Set M2 speed to: ");
+      //Serial.println(m2speed);
+      if (m2speed == ERROR_CODE) return;
       md.setSpeeds(m1speed, m2speed);
     }
     else if (input == 'D') {
