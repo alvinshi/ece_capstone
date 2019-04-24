@@ -157,16 +157,16 @@ class Core:
                     else:
                         (left_speed, right_speed, pre_error) = self.__pid_speed(ball_center, pre_error)
                         self.motor.set_speed(int(left_speed), int(right_speed))
-                        print("Track State: Tracking with {} {}".format(left_speed, right_speed))
+                        #print("Track State: Tracking with {} {}".format(left_speed, right_speed))
                 else: # Player not in the scope
                     (left_speed, right_speed, pre_error) = self.__pid_speed(ball_center, pre_error)
                     self.motor.set_speed(int(left_speed), int(right_speed))
-                    print("Track State: Tracking with {} {}".format(left_speed, right_speed))
+                    #print("Track State: Tracking with {} {}".format(left_speed, right_speed))
             else: # Lose ball
                 num_not_found += 1
                 print("Track State: Lost the ball for {} iterations".format(num_not_found))
                 self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
-                print("Track State: Set speed after lost")
+                #print("Track State: Set speed after lost")
                 if num_not_found >= self.max_unfound:
                     print("Track State: Permanent loss, transition to Search State")
                     return RetrieverState.SEARCH
@@ -217,27 +217,40 @@ class Core:
         pre_error = 0
         total_error=0
         while True:
-            img = self.cam.grab_img()
-            player_center = self.cam.detect_player(img[0])
+            sample_size=3
+            count=0
+            ###################
+            #Added sample size
+            ###################
+            while count<sample_size:
+                img = self.cam.grab_img()
+                player_center = self.cam.detect_player(img[0])
+                
+                if player_center != 0: # Player in scope
+                    num_not_found = 0
+                    
+                    player_distance = self.stereo.measure_player_dist(img, player_center)
+                    if player_distance < self.OFFER_THRESHOD and player_distance != 0:
+                        count+=1
+                    elif player_distance != 0:
+                        count-=1
+                    if player_distance < self.OFFER_THRESHOD and player_distance != 0 and count==sample_size-1:
+                        print("Offer State: Close enough, transition to the release state")
+                        return RetrieverState.RELEASE
 
-            if player_center != 0: # Player in scope
-                num_not_found = 0
-                player_distance = self.stereo.measure_player_dist(img, player_center)
-          
-                if player_distance < self.OFFER_THRESHOD and player_distance != 0:
-                    print("Offer State: Close enough, transition to the release state")
-                    return RetrieverState.RELEASE
-
-                (left_speed, right_speed, pre_error) = self.__pid_speed(player_center, pre_error)
-                self.motor.set_speed(int(left_speed), int(right_speed))
-                print("Offer State: Approaching with {} {} distance: {}".format(left_speed, right_speed,player_distance))
-            else: # Lost Player
-                num_not_found += 1
-                self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
-                print("Offer State: Lost the player for {} iterations".format(num_not_found))
-                if num_not_found >= self.max_player_unfound:
-                    print("Offer State: Permanent loss, transition to Player_Search State")
-                    return RetrieverState.PLAYER_SEARCH
+                    (left_speed, right_speed, pre_error) = self.__pid_speed(player_center, pre_error)
+                    self.motor.set_speed(int(left_speed), int(right_speed))
+                    #print("Offer State: Approaching with {} {} distance: {}".format(left_speed, right_speed,player_distance))
+                else: # Lost Player
+                    count-=1
+                    if count<0:
+                        count=0
+                    num_not_found += 1
+                    self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
+                    print("Offer State: Lost the player for {} iterations".format(num_not_found))
+                    if num_not_found >= self.max_player_unfound:
+                        print("Offer State: Permanent loss, transition to Player_Search State")
+                        return RetrieverState.PLAYER_SEARCH
 
     def release(self):
         print('Release State: Start release')

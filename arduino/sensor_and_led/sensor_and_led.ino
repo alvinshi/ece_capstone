@@ -108,7 +108,7 @@ state get_next_mode(state current_mode) {
       return PLAYER_SEARCH;
     }
     else if (input == 'G') {
-      return PLAYER_APPROACH;
+      return GO_PLAYER;
     }
     else if (input == 'R') {
       return RETURN;

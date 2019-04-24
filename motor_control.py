@@ -44,9 +44,9 @@ class Motor:
         left = left * self.gear
         right = right * self.gear
         serial_command = "M{}{}".format(Motor.__format_serial_speed_input(left), Motor.__format_serial_speed_input(right))
-        print("Set Speed Write")
+        #print("Set Speed Write")
         ret=self.ser.write(bytes(serial_command, 'utf-8'))
-        print("Write "+str(ret)+" bytes")
+        #print("Write "+str(ret)+" bytes")
 
     def accelerate(self, boost):
         maximum_boost = min(Motor.MAXIMUM_SPEED - self.left_speed, Motor.MAXIMUM_SPEED - self.right_speed)

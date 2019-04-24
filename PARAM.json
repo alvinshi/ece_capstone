@@ -3,7 +3,7 @@
     "MOVE":1,
     
     "KP":1,
-    "KD":0,
+    "KD":0.7,
     "KI":0,
     "BASE_SPEED":100,
     "MAX_SPEED":200,
@@ -13,7 +13,7 @@
     
     "DIST_THRESHOLD":1,
     "MAX_UNFOUND":30,
-    "MAX_PLAYER_UNFOUND":3,
+    "MAX_PLAYER_UNFOUND":10,
     "OFFER_THRESHOLD":0.5,
 
     "BATCH_SIZE":1,
