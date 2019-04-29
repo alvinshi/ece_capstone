@@ -147,6 +147,7 @@ class Core:
                 self.cam.display_img(ball_center,player_center,img[0])
 
             if ball_center != 0: # Ball found
+                if num_not_found != 0: self.ultra_led.to_track()
                 num_not_found = 0
                 if player_center != 0: # Player in the scope
                     distance = self.stereo.measure_dist(img, ball_center, player_center)
@@ -216,41 +217,33 @@ class Core:
         num_not_found = 0
         pre_error = 0
         total_error=0
+        pre_dist=0
         while True:
-            sample_size=3
-            count=0
-            ###################
-            #Added sample size
-            ###################
-            while count<sample_size:
-                img = self.cam.grab_img()
-                player_center = self.cam.detect_player(img[0])
-                
-                if player_center != 0: # Player in scope
-                    num_not_found = 0
+            
+            img = self.cam.grab_img()
+            player_center = self.cam.detect_player(img[0])
+            
+            if player_center != 0: # Player in scope
+                num_not_found = 0
                     
-                    player_distance = self.stereo.measure_player_dist(img, player_center)
-                    if player_distance < self.OFFER_THRESHOD and player_distance != 0:
-                        count+=1
-                    elif player_distance != 0:
-                        count-=1
-                    if player_distance < self.OFFER_THRESHOD and player_distance != 0 and count==sample_size-1:
-                        print("Offer State: Close enough, transition to the release state")
-                        return RetrieverState.RELEASE
+                player_distance = self.stereo.measure_player_dist(img, player_center)
+                
+                if player_distance < self.OFFER_THRESHOD and player_distance != 0 and abs(player_distance-pre_dist)<0.5 and pre_dist!=0 and player_center[0]>200 and player_center[0]<600:
+                    print("Offer State: Close enough, transition to the release state")
+                    return RetrieverState.RELEASE
 
-                    (left_speed, right_speed, pre_error) = self.__pid_speed(player_center, pre_error)
-                    self.motor.set_speed(int(left_speed), int(right_speed))
+                (left_speed, right_speed, pre_error) = self.__pid_speed(player_center, pre_error)
+                self.motor.set_speed(int(left_speed), int(right_speed))
+                if player_distance !=0:
+                    pre_dist=player_distance
                     #print("Offer State: Approaching with {} {} distance: {}".format(left_speed, right_speed,player_distance))
-                else: # Lost Player
-                    count-=1
-                    if count<0:
-                        count=0
-                    num_not_found += 1
-                    self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
-                    print("Offer State: Lost the player for {} iterations".format(num_not_found))
-                    if num_not_found >= self.max_player_unfound:
-                        print("Offer State: Permanent loss, transition to Player_Search State")
-                        return RetrieverState.PLAYER_SEARCH
+            else: # Lost Player
+                num_not_found += 1
+                self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
+                print("Offer State: Lost the player for {} iterations".format(num_not_found))
+                if num_not_found >= self.max_player_unfound:
+                    print("Offer State: Permanent loss, transition to Player_Search State")
+                    return RetrieverState.PLAYER_SEARCH
 
     def release(self):
         print('Release State: Start release')

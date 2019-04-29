@@ -1,9 +1,9 @@
 {
     "VISUALIZE":0,
     "MOVE":1,
-    
+   
     "KP":1,
-    "KD":0.7,
+    "KD":0.5,
     "KI":0,
     "BASE_SPEED":100,
     "MAX_SPEED":200,
