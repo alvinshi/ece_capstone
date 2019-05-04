@@ -67,24 +67,24 @@ void loop()
       md.setSpeeds(m1speed, m2speed);
     }
     else if (input == 'D') {
-      myStepper.step(stepsPerRevolution);
+      myStepper.step(stepsPerRevolution * 3 / 2);
       delay(200);
-      myStepper.step(stepsPerRevolution);
-      delay(200);
-      myStepper.step(stepsPerRevolution);
-      delay(200);
+      //myStepper.step(stepsPerRevolution);
+      //delay(200);
+      //myStepper.step(stepsPerRevolution);
+      //delay(200);
       //myStepper.step(stepsPerRevolution);
       //delay(200);
       //myStepper.step(stepsPerRevolution);
       //delay(200);
     }
     else if (input == 'U') {
-      myStepper.step(-stepsPerRevolution);
+      myStepper.step(-stepsPerRevolution * 3 / 2);
       delay(200);
-      myStepper.step(-stepsPerRevolution);
-      delay(200);
-      myStepper.step(-stepsPerRevolution);
-      delay(200);
+      //myStepper.step(-stepsPerRevolution);
+      //delay(200);
+      //myStepper.step(-stepsPerRevolution);
+      //delay(200);
       //myStepper.step(-stepsPerRevolution);
       //delay(200);
       //myStepper.step(-stepsPerRevolution);
