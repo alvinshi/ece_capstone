@@ -238,6 +238,7 @@ class Core:
                     pre_dist=player_distance
                     #print("Offer State: Approaching with {} {} distance: {}".format(left_speed, right_speed,player_distance))
             else: # Lost Player
+                pre_dist=0
                 num_not_found += 1
                 self.motor.set_speed(self.IDLE_SPEED, self.IDLE_SPEED)
                 print("Offer State: Lost the player for {} iterations".format(num_not_found))
