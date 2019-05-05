@@ -10,7 +10,8 @@ enum state {
   PLAYER_SEARCH,
   GO_PLAYER,
   RETURN,
-  INIT
+  INIT,
+  CAPTURE_FAILURE
 };
 
 // 0 wait, 1 track, 2 approach, 3 detected
@@ -98,6 +99,16 @@ state get_next_mode(state current_mode) {
         return APPROACH;
       }
     }
+    else if (input == 'V') {
+      if (measure()) {
+        Serial.println("1");
+        return DETECTED;
+      }
+      else {
+        Serial.println("0");
+        return CAPTURE_FAILURE;
+      }
+    }
     else if (input == 'T') {
       return TRACK;
     }
@@ -171,6 +182,17 @@ void loop()
       prev_mode = mode;
       mode = get_next_mode(mode);
       break;
+   case CAPTURE_FAILURE:
+     if (mode != prev_mode) {
+        for (int i = 0; i < NUM_LEDS; i++) {
+            leds_1[i] = CRGB::Red;
+            leds_2[i] = CRGB::Red;
+        }
+        FastLED.show();
+     }
+     prev_mode = mode;
+     mode = get_next_mode(mode);
+     break;
    case PLAYER_SEARCH: // Player search state, flashing white lights
      if (player_search_light_on) {
        for (int i = 0; i < NUM_LEDS; i++) {

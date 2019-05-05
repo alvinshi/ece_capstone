@@ -16,6 +16,15 @@ class UltrasonicAndLED:
         except ValueError:
             return False
 
+    def validate(self):
+        self.ser.write(bytes("V", 'utf-8'))
+        result = self.ser.readline()
+        try:
+            value = int(result)
+            return value == 1
+        except ValueError:
+            return False
+
     def to_wait(self):
         self.ser.write(bytes("W", 'utf-8'))
 

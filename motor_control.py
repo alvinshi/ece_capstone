@@ -103,6 +103,13 @@ class Motor:
         else:
             return
 
+    def backup(self, backup_speed):
+        self.reverse_gear()
+        self.set_speed(backup_speed, backup_speed)
+        time.sleep(5)
+        self.reverse_gear()
+
+
 class DummyMotor:
     def __init__(self):
         return
@@ -138,4 +145,7 @@ class DummyMotor:
         return
 
     def step_motor_down(self):
+        return
+
+    def backup(self, backup_speed):
         return

@@ -182,17 +182,16 @@ class Core:
         print("Capture State: Start Capturing")
         self.motor.step_motor_down()
         print("Capture State: Successfully captured, transition to player_search state")
-        return RetrieverState.PLAYER_SEARCH
 
         #To Confirm the ball is in
-        # TODO: incompatible with led control
-        # if self.ultra_led.measure():
-        #     print("Capture State: Successfully captured, transition to player_search state")
-        #     return RetrieverState.PLAYER_SEARCH
-        # else:
-        #     self.motor.step_motor_up()
-        #     print("Capture State: Failure, transition to search state")
-        #     return RetrieverState.SEARCH
+        if self.ultra_led.validate():
+            print("Capture State: Successfully captured, transition to player_search state")
+            return RetrieverState.PLAYER_SEARCH
+        else:
+            print("Capture State: Failure, transition to search state")
+            self.motor.step_motor_up()
+            self.motor.backup(self.IDLE_SPEED)
+            return RetrieverState.SEARCH
 
     def player_search(self):
         print('Player_Search State: Start Searching')
